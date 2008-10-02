@@ -1,6 +1,6 @@
 module Dataset
   class Session
-    def initialize(database = Sqlite3Database.new)
+    def initialize(database)
       @database = database
       @test_datasets = Hash.new {|h,k| h[k] = []}
       @loaded_datasets = Hash.new

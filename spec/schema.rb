@@ -12,11 +12,8 @@ ActiveRecord::Schema.define do
   create_table :things, :force => true do |t|
     t.column :name, :string
     t.column :description, :string
-  end
-  
-  create_table :models, :force => true do |t|
-    t.column :name, :string
-    t.column :description, :string
+    t.column :created_on, :date
+    t.column :updated_on, :date
   end
   
   create_table :notes, :force => true do |t|

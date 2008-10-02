@@ -34,7 +34,7 @@ describe Dataset::Session do
     end
   end
   
-  describe Dataset::Session, 'dataset loading' do
+  describe 'dataset loading' do
     before do
       @test_case = Class.new(Test::Unit::TestCase)
       @test_subclass = Class.new(@test_case)
