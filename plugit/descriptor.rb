@@ -1,5 +1,4 @@
 require 'rubygems'
-gem 'plugit'
 require 'plugit'
 
 PLUGIT_ROOT = File.expand_path(File.dirname(__FILE__))

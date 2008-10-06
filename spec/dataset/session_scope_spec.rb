@@ -65,4 +65,15 @@ describe Dataset::SessionScope do
       person.last_name.should == 'Williams'
     end
   end
+  
+  describe 'nested scopes' do
+    before do
+      @session_scope.create_model Thing, :mything, :name => 'my thing'
+      @nested_scope = Dataset::SessionScope.new(@session_scope)
+    end
+    
+    it 'should walk up the tree to find models' do
+      @nested_scope.find_model(Thing, :mything).should == @session_scope.find_model(Thing, :mything)
+    end
+  end
 end
