@@ -30,42 +30,6 @@ module Dataset
       else
         load_datasets(current_load)
       end
-      
-      # if @test_ancestry.nil? || !@test_ancestry.include?(test)
-      #   @test_ancestry = test_ancestry test
-      #   @scope = SessionBinding.new(@database)
-      #   load_root @scope, @test_ancestry, test
-      # elsif @test_ancestry.include?(test)
-      #   if @test_ancestry.peer?(test)
-      #     @scope = SessionBinding.new(@scope.parent_binding)
-      #     load_peer @scope, @test_ancestry, test
-      #   elsif @test_ancestry.descendent?(test)
-      #     @scope = SessionBinding.new(@scope)
-      #     load_descendent @scope, @test_ancestry, test
-      #   else
-      #     raise 'I do not understand how an ancestor could be run'
-      #   end
-      # else
-      #   raise 'I do not understand how it could get here'
-      # end
-    end
-    
-    def load_root(ancestry, test)
-      @database.clear
-      load_dataset ancestry.dataset(test), @scope
-      ancestry.active_test = test
-    end
-    
-    def load_peer(ancestry, test)
-      datasets_of_prior = datasets ancestry.active_test
-      @database.capture datasets_of_prior
-      load_dataset ancestry.dataset(test), @scope
-    end
-    
-    def load_descendent(ancestry, test)
-      datasets_of_prior = datasets ancestry.active_test
-      @database.capture datasets_of_prior
-      load_dataset ancestry.dataset(test), @scope
     end
     
     protected

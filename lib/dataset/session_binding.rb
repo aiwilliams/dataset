@@ -1,6 +1,7 @@
 module Dataset
   class SessionBinding
     attr_reader :database, :parent_binding
+    attr_reader :instance_loaders
     
     def initialize(database_or_parent_binding)
       case database_or_parent_binding
@@ -10,7 +11,9 @@ module Dataset
       else 
         @database = database_or_parent_binding
       end
+      
       @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
+      @instance_loaders = new_instance_loaders_module
     end
     
     def create_model(record_type, *args)
@@ -19,6 +22,15 @@ module Dataset
     
     def create_record(record_type, *args)
       insert(Dataset::Record::Fixture, record_type, *args)
+    end
+    
+    def find_id(record_type, symbolic_name)
+      record_class = resolve_record_class record_type
+      if local_id = @symbolic_names_to_ids[record_class][symbolic_name]
+        local_id
+      elsif !parent_binding.nil?
+        parent_binding.find_id record_type, symbolic_name
+      end
     end
     
     def find_model(record_type, symbolic_name)
@@ -36,12 +48,11 @@ module Dataset
         record_class = resolve_record_class record_type
         record_meta  = database.record_meta record_class
         record       = dataset_record_class.new(record_meta, attributes, symbolic_name)
+        @instance_loaders.create_loader(record.record_class) unless @symbolic_names_to_ids.has_key?(record.record_class)
         return_value = nil
         ActiveRecord::Base.silence do
           return_value = record.create
           @symbolic_names_to_ids[record.record_class][symbolic_name] = record.id
-          # data_session.update_table_readers(record)
-          # self.extend data_session.table_readers
         end
         return_value
       end
@@ -50,10 +61,37 @@ module Dataset
         if arguments.size == 2 && arguments.last.kind_of?(Hash)
           arguments
         elsif arguments.size == 1 && arguments.last.kind_of?(Hash)
-          [nil, arguments[0]]
+          [nil, arguments.last]
+        elsif arguments.size == 1 && arguments.last.kind_of?(Symbol)
+          [arguments.last, Hash.new]
         else
           [nil, Hash.new]
         end
+      end
+      
+      def new_instance_loaders_module
+        mod = Module.new
+        
+        dataset_binding = self
+        mod.module_eval do
+          define_method :dataset_session_binding do
+            dataset_binding
+          end
+        end
+        
+        class << mod
+          def create_loader(record_class)
+            record_loader_base_name = record_class.name.underscore
+            define_method record_loader_base_name.pluralize do |symbolic_name|
+              dataset_session_binding.find_model(record_class, symbolic_name)
+            end
+            define_method "#{record_loader_base_name}_id" do |symbolic_name|
+              dataset_session_binding.find_id(record_class, symbolic_name)
+            end
+          end
+        end
+        
+        mod
       end
       
       def resolve_record_class(record_type)
@@ -66,6 +104,5 @@ module Dataset
           record_type.constantize
         end
       end
-      
   end
 end

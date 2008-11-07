@@ -17,19 +17,23 @@ module Dataset
 end
 
 class Test::Unit::TestCase
-  def self.dataset(dataset)
-    dataset_session.add_dataset(self, dataset)
-  end
-  
-  def self.dataset_session
-    @dataset_session ||= Dataset::Session.new(Dataset::Database::Base.new)
-  end
-  
   class << self
     def suite_with_dataset
       Dataset::TestSuite.new(suite_without_dataset, self)
     end
     alias suite_without_dataset suite
     alias suite suite_with_dataset
+    
+    def dataset(dataset)
+      dataset_session.add_dataset(self, dataset)
+    end
+    
+    def dataset_session
+      @dataset_session ||= Dataset::Session.new(Dataset::Database::Base.new)
+    end
+  end
+  
+  def dataset_session
+    self.class.dataset_session
   end
 end
