@@ -2,49 +2,81 @@ module Dataset
   class Session
     def initialize(database)
       @database = database
-      @test_datasets = Hash.new {|h,k| h[k] = []}
-      @loaded_datasets = Hash.new
+      @datasets = Hash.new
+      @loaded_datasets = []
     end
     
-    def add_dataset(test, dataset)
-      @test_datasets[test] << dataset
-      @test_datasets[test].uniq!
+    def add_dataset(test_class, dataset)
+      datasets_for(test_class) << dataset
     end
     
-    def datasets(test)
-      test_ancestry(test).reverse.collect {|c| @test_datasets[c]}.flatten.uniq
-    end
-    
-    def load_datasets(test)
-      prior_test, @current_test = @current_test, test
-      return if @current_datasets == (datasets = self.datasets(test))
-      
-      in_prior_test_hierarchy = test_ancestry(@current_test).include?(prior_test)
-      if @current_datasets
-        @database.capture @current_datasets
-        @database.clear unless in_prior_test_hierarchy
+    def datasets_for(test_class)
+      if test_class.superclass
+        @datasets[test_class] ||= Collection.new(datasets_for(test_class.superclass) || [])
       end
+    end
+    
+    def load_datasets_for(test_class)
+      current_load = datasets_for(test_class)
+      return if current_load == @last_load
       
-      unless @database.restore(datasets)
-        datasets_to_load = datasets
-        datasets_to_load = datasets_to_load - self.datasets(prior_test) if in_prior_test_hierarchy
-        datasets_to_load.each do |dataset|
-          instance = dataset.new
-          instance.load
+      if @last_load
+        if @last_load.subset?(current_load)
+          @database.capture(@last_load)
+          load_datasets(current_load)
+        elsif !@database.restore(current_load)
+          load_datasets(current_load)
         end
+      else
+        load_datasets(current_load)
       end
       
-      @current_datasets = datasets
+      # if @test_ancestry.nil? || !@test_ancestry.include?(test)
+      #   @test_ancestry = test_ancestry test
+      #   @scope = SessionScope.new(@database)
+      #   load_root @scope, @test_ancestry, test
+      # elsif @test_ancestry.include?(test)
+      #   if @test_ancestry.peer?(test)
+      #     @scope = SessionScope.new(@scope.parent_scope)
+      #     load_peer @scope, @test_ancestry, test
+      #   elsif @test_ancestry.descendent?(test)
+      #     @scope = SessionScope.new(@scope)
+      #     load_descendent @scope, @test_ancestry, test
+      #   else
+      #     raise 'I do not understand how an ancestor could be run'
+      #   end
+      # else
+      #   raise 'I do not understand how it could get here'
+      # end
+    end
+    
+    def load_root(ancestry, test)
+      @database.clear
+      load_dataset ancestry.dataset(test), @scope
+      ancestry.active_test = test
+    end
+    
+    def load_peer(ancestry, test)
+      datasets_of_prior = datasets ancestry.active_test
+      @database.capture datasets_of_prior
+      load_dataset ancestry.dataset(test), @scope
+    end
+    
+    def load_descendent(ancestry, test)
+      datasets_of_prior = datasets ancestry.active_test
+      @database.capture datasets_of_prior
+      load_dataset ancestry.dataset(test), @scope
     end
     
     protected
-      def test_ancestry(test)
-        hierarchy, sup = [], test
-        begin
-          hierarchy << sup
-          sup = sup.superclass
-        end until sup == Test::Unit::TestCase
-        hierarchy
+      def load_datasets(datasets)
+        datasets.each do |dataset|
+          unless @loaded_datasets.include?(dataset)
+            dataset.new.load
+            @loaded_datasets << dataset
+          end
+        end
+        @last_load = datasets
       end
   end
 end
