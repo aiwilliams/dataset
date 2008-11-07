@@ -114,7 +114,8 @@ describe Dataset::Session do
       Place.count.should == 0
     end
     
-    xit 'should be created for each dataset load, wrapping the outer scope' do
+    it 'should be created for each dataset load, wrapping the outer scope' do
+      pending
       test_subclass_peer = Class.new(TestCaseRoot)
       
       scope_one   = stub(Dataset::SessionBinding, :parent_scope => nil)
