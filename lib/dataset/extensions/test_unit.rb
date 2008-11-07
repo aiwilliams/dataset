@@ -1,3 +1,21 @@
+module Dataset
+  class TestSuite
+    def initialize(suite, test_class)
+      @suite = suite
+      @test_class = test_class
+    end
+    
+    def run(result, &progress_block)
+      @test_class.dataset_session.load_datasets_for(@test_class)
+      @suite.run(result, &progress_block)
+    end
+    
+    def method_missing(method_symbol, *args)
+      @suite.send(method_symbol, *args)
+    end
+  end
+end
+
 class Test::Unit::TestCase
   def self.dataset(dataset)
     dataset_session.add_dataset(self, dataset)
@@ -7,17 +25,11 @@ class Test::Unit::TestCase
     @dataset_session ||= Dataset::Session.new(Dataset::Database::Base.new)
   end
   
-  def dataset_session
-    self.class.dataset_session
+  class << self
+    def suite_with_dataset
+      Dataset::TestSuite.new(suite_without_dataset, self)
+    end
+    alias suite_without_dataset suite
+    alias suite suite_with_dataset
   end
-end
-
-class Test::Unit::TestSuite
-  def run_with_dataset(result, &progress_block)
-    first_test_in_suite = tests.first
-    first_test_in_suite.dataset_session.load_datasets_for(first_test_in_suite.class)
-    run_without_dataset(result, &progress_block)
-  end
-  alias run_without_dataset run
-  alias run run_with_dataset
 end
