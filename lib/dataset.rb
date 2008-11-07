@@ -9,5 +9,7 @@ require 'dataset/record/meta'
 require 'dataset/record/fixture'
 require 'dataset/record/model'
 
+require 'dataset/extensions/test_unit' if defined?(Test::Unit)
+
 module Dataset
 end
