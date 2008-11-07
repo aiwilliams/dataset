@@ -1,14 +1,14 @@
 module Dataset
-  class SessionScope
-    attr_reader :database, :parent_scope
+  class SessionBinding
+    attr_reader :database, :parent_binding
     
-    def initialize(database_or_parent_scope)
-      case database_or_parent_scope
-      when Dataset::SessionScope
-        @parent_scope = database_or_parent_scope
-        @database = parent_scope.database
+    def initialize(database_or_parent_binding)
+      case database_or_parent_binding
+      when Dataset::SessionBinding
+        @parent_binding = database_or_parent_binding
+        @database = parent_binding.database
       else 
-        @database = database_or_parent_scope
+        @database = database_or_parent_binding
       end
       @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
     end
@@ -25,8 +25,8 @@ module Dataset
       record_class = resolve_record_class record_type
       if local_id = @symbolic_names_to_ids[record_class][symbolic_name]
         record_class.find local_id
-      elsif !parent_scope.nil?
-        parent_scope.find_model record_type, symbolic_name
+      elsif !parent_binding.nil?
+        parent_binding.find_model record_type, symbolic_name
       end
     end
     

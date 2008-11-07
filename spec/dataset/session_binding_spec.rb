@@ -1,13 +1,13 @@
 require File.expand_path(File.dirname(__FILE__)) + '/../spec_helper'
 
-describe Dataset::SessionScope do
+describe Dataset::SessionBinding do
   before :all do
     @database = Dataset::Database::Sqlite3.new(SQLITE_DATABASE, "#{SPEC_ROOT}/tmp")
   end
   
   before do
     @database.clear
-    @session_scope = Dataset::SessionScope.new(@database)
+    @session_scope = Dataset::SessionBinding.new(@database)
   end
   
   it 'should support direct record inserts like classic fixtures' do
@@ -69,7 +69,7 @@ describe Dataset::SessionScope do
   describe 'nested scopes' do
     before do
       @session_scope.create_model Thing, :mything, :name => 'my thing'
-      @nested_scope = Dataset::SessionScope.new(@session_scope)
+      @nested_scope = Dataset::SessionBinding.new(@session_scope)
     end
     
     it 'should walk up the tree to find models' do

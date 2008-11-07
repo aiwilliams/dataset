@@ -117,9 +117,9 @@ describe Dataset::Session do
     xit 'should be created for each dataset load, wrapping the outer scope' do
       test_subclass_peer = Class.new(TestCaseRoot)
       
-      scope_one   = stub(Dataset::SessionScope, :parent_scope => nil)
-      scope_two   = stub(Dataset::SessionScope, :parent_scope => scope_one)
-      scope_three = stub(Dataset::SessionScope, :parent_scope => scope_one)
+      scope_one   = stub(Dataset::SessionBinding, :parent_scope => nil)
+      scope_two   = stub(Dataset::SessionBinding, :parent_scope => scope_one)
+      scope_three = stub(Dataset::SessionBinding, :parent_scope => scope_one)
       
       @session.should_receive(:new_scope).with(@database).and_return scope_one
       @session.should_receive(:new_scope).with(scope_one).and_return scope_two

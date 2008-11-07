@@ -33,14 +33,14 @@ module Dataset
       
       # if @test_ancestry.nil? || !@test_ancestry.include?(test)
       #   @test_ancestry = test_ancestry test
-      #   @scope = SessionScope.new(@database)
+      #   @scope = SessionBinding.new(@database)
       #   load_root @scope, @test_ancestry, test
       # elsif @test_ancestry.include?(test)
       #   if @test_ancestry.peer?(test)
-      #     @scope = SessionScope.new(@scope.parent_scope)
+      #     @scope = SessionBinding.new(@scope.parent_binding)
       #     load_peer @scope, @test_ancestry, test
       #   elsif @test_ancestry.descendent?(test)
-      #     @scope = SessionScope.new(@scope)
+      #     @scope = SessionBinding.new(@scope)
       #     load_descendent @scope, @test_ancestry, test
       #   else
       #     raise 'I do not understand how an ancestor could be run'
