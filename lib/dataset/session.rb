@@ -3,7 +3,7 @@ module Dataset
     def initialize(database)
       @database = database
       @datasets = Hash.new
-      @loaded_datasets = []
+      @load_stack = []
     end
     
     def add_dataset(test_class, dataset)
@@ -17,30 +17,25 @@ module Dataset
     end
     
     def load_datasets_for(test_class)
-      current_load = datasets_for(test_class)
-      return if current_load == @last_load
-      
-      if @last_load
-        if @last_load.subset?(current_load)
-          @database.capture(@last_load)
-          load_datasets(current_load)
-        elsif !@database.restore(current_load)
-          load_datasets(current_load)
+      datasets = datasets_for(test_class)
+      if last_load = @load_stack.last
+        if last_load.datasets.subset?(datasets)
+          @database.capture(last_load.datasets)
+          current_load = Load.new(datasets, last_load.dataset_binding)
+          current_load.execute(last_load.datasets)
+          @load_stack.push(current_load)
+        else
+          @load_stack.pop
+          last_load = @load_stack.last
+          @database.restore(last_load.datasets) if last_load
+          load_datasets_for(test_class)
         end
       else
-        load_datasets(current_load)
+        @database.clear
+        current_load = Load.new(datasets, @database)
+        current_load.execute([])
+        @load_stack.push(current_load)
       end
     end
-    
-    protected
-      def load_datasets(datasets)
-        datasets.each do |dataset|
-          unless @loaded_datasets.include?(dataset)
-            dataset.new.load
-            @loaded_datasets << dataset
-          end
-        end
-        @last_load = datasets
-      end
   end
 end

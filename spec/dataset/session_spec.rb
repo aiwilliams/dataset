@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__)) + '/../spec_helper'
 
 TestCaseRoot = Class.new(Test::Unit::TestCase)
 TestCaseChild = Class.new(TestCaseRoot)
+TestCaseSibling = Class.new(TestCaseRoot)
 TestCaseGrandchild = Class.new(TestCaseChild)
 
 DatasetOne = Class.new(Dataset::Base)
@@ -107,24 +108,22 @@ describe Dataset::Session do
       Thing.count.should == 1
       Place.count.should == 1
       
-      @session.load_datasets_for TestCaseRoot
+      @session.load_datasets_for TestCaseSibling
       dataset_one_load_count.should == 1
       dataset_two_load_count.should == 1
       Thing.count.should == 1
       Place.count.should == 0
     end
-    
-    it 'should be created for each dataset load, wrapping the outer scope' do
-      pending
-      test_subclass_peer = Class.new(TestCaseRoot)
-      
+  end
+  
+  describe 'bindings' do
+    it 'should be created for each dataset load, wrapping the outer binding' do
       scope_one   = stub(Dataset::SessionBinding, :parent_scope => nil)
       scope_two   = stub(Dataset::SessionBinding, :parent_scope => scope_one)
       scope_three = stub(Dataset::SessionBinding, :parent_scope => scope_one)
       
-      @session.should_receive(:new_scope).with(@database).and_return scope_one
-      @session.should_receive(:new_scope).with(scope_one).and_return scope_two
-      @session.should_receive(:new_scope).with(scope_one).and_return scope_three
+      Dataset::SessionBinding.should_receive(:new).with(@database).and_return(scope_one)
+      Dataset::SessionBinding.should_receive(:new).with(scope_one).twice().and_return(scope_two)
       
       dataset_one = Class.new(Dataset::Base) { define_method :load do; end }
       dataset_two = Class.new(Dataset::Base) { define_method :load do; end }
@@ -134,7 +133,7 @@ describe Dataset::Session do
       
       @session.load_datasets_for TestCaseRoot
       @session.load_datasets_for TestCaseChild
-      @session.load_datasets_for test_subclass_peer
+      @session.load_datasets_for TestCaseSibling
     end
   end
 end
