@@ -10,6 +10,7 @@ module Dataset
     def execute(loaded_datasets)
       (datasets - loaded_datasets).each do |dataset|
         instance = dataset.new
+        instance.extend dataset_binding.record_methods
         instance.load
       end
     end

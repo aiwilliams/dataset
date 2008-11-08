@@ -1,7 +1,7 @@
 module Dataset
   class SessionBinding
     attr_reader :database, :parent_binding
-    attr_reader :instance_loaders
+    attr_reader :instance_loaders, :record_methods
     
     def initialize(database_or_parent_binding)
       case database_or_parent_binding
@@ -13,6 +13,7 @@ module Dataset
       end
       
       @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
+      @record_methods = new_record_methods_module
       @instance_loaders = new_instance_loaders_module
     end
     
@@ -69,6 +70,11 @@ module Dataset
         end
       end
       
+      # Describe this as a wrapper around a binding, so that folks who want
+      # these methods don't have to do something like:
+      #
+      #   session_binding.create_record *args
+      #
       def new_instance_loaders_module
         mod = Module.new
         
@@ -88,6 +94,22 @@ module Dataset
             define_method "#{record_loader_base_name}_id" do |symbolic_name|
               dataset_session_binding.find_id(record_class, symbolic_name)
             end
+          end
+        end
+        
+        mod
+      end
+      
+      def new_record_methods_module
+        mod = Module.new do
+          delegate :create_record, :create_model, :find_id, :find_model,
+            :to => :dataset_session_binding
+        end
+        
+        dataset_binding = self
+        mod.module_eval do
+          define_method :dataset_session_binding do
+            dataset_binding
           end
         end
         

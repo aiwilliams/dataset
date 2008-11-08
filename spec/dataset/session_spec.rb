@@ -114,13 +114,30 @@ describe Dataset::Session do
       Thing.count.should == 1
       Place.count.should == 0
     end
+    
+    it 'should install the record methods into the datasets' do
+      instance_of_dataset_one = nil
+      dataset_one = Class.new(Dataset::Base) do
+        define_method :load do
+          instance_of_dataset_one = self
+        end
+      end
+      
+      @session.add_dataset TestCaseRoot, dataset_one
+      @session.load_datasets_for TestCaseRoot
+      instance_of_dataset_one.should_not be_nil
+      instance_of_dataset_one.should respond_to(:create_record)
+      instance_of_dataset_one.should respond_to(:create_model)
+      instance_of_dataset_one.should respond_to(:find_model)
+      instance_of_dataset_one.should respond_to(:find_id)
+    end
   end
   
   describe 'bindings' do
     it 'should be created for each dataset load, wrapping the outer binding' do
-      scope_one   = stub(Dataset::SessionBinding, :parent_scope => nil)
-      scope_two   = stub(Dataset::SessionBinding, :parent_scope => scope_one)
-      scope_three = stub(Dataset::SessionBinding, :parent_scope => scope_one)
+      scope_one   = Dataset::SessionBinding.new(@database)
+      scope_two   = Dataset::SessionBinding.new(scope_one)
+      scope_three = Dataset::SessionBinding.new(scope_one)
       
       Dataset::SessionBinding.should_receive(:new).with(@database).and_return(scope_one)
       Dataset::SessionBinding.should_receive(:new).with(scope_one).twice().and_return(scope_two)
