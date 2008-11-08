@@ -58,7 +58,7 @@ describe Dataset::SessionBinding do
     it 'should provide an instance loader methods for created types' do
       id = @binding.create_record(Note, :mynote)
       anything = Object.new
-      anything.extend(@binding.instance_loaders)
+      anything.extend @binding.instance_loaders
       anything.notes(:mynote).should_not be_nil
       anything.notes(:mynote).id.should == id
       anything.note_id(:mynote).should == id

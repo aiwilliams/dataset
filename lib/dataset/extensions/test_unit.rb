@@ -5,8 +5,17 @@ module Dataset
       @test_class = test_class
     end
     
+    def dataset_session
+      @test_class.dataset_session
+    end
+    
     def run(result, &progress_block)
-      @test_class.dataset_session.load_datasets_for(@test_class) if @test_class.dataset_session
+      if dataset_session
+        load = dataset_session.load_datasets_for(@test_class)
+        @suite.tests.each do |test_instance|
+          test_instance.extend load.dataset_binding.instance_loaders
+        end
+      end
       @suite.run(result, &progress_block)
     end
     

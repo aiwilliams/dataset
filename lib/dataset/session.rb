@@ -28,7 +28,7 @@ module Dataset
           @load_stack.pop
           last_load = @load_stack.last
           @database.restore(last_load.datasets) if last_load
-          load_datasets_for(test_class)
+          current_load = load_datasets_for(test_class)
         end
       else
         @database.clear
@@ -36,6 +36,7 @@ module Dataset
         current_load.execute([])
         @load_stack.push(current_load)
       end
+      current_load
     end
   end
 end

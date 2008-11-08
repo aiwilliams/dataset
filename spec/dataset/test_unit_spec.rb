@@ -83,6 +83,27 @@ describe Test::Unit::TestCase do
     load_count.should be(1)
   end
   
+  it 'should expose data reading methods from dataset binding to the test methods through the test instances' do
+    created_model, found_model = nil
+    dataset = Class.new(Dataset::Base) do
+      define_method(:load) do
+        created_model = create_model(Thing, :mything)
+      end
+    end
+    
+    testcase = Class.new(Test::Unit::TestCase) do
+      self.dataset(dataset)
+      define_method :test_instance_loaders do
+        found_model = things(:mything)
+      end
+    end
+    
+    run_testcase(testcase)
+    testcase.should_not respond_to(:things)
+    found_model.should_not be_nil
+    found_model.should == created_model
+  end
+  
   def run_testcase(testcase)
     result = Test::Unit::TestResult.new
     testcase.suite.run(result) {}
