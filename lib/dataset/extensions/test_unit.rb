@@ -23,9 +23,12 @@ class Test::Unit::TestCase
     end
     alias_method_chain :suite, :dataset
     
-    def dataset(dataset)
+    def dataset(*datasets, &block)
       @dataset_session ||= Dataset::Session.new(Dataset::Database::Base.new)
-      @dataset_session.add_dataset(self, dataset)
+      datasets.each { |dataset| @dataset_session.add_dataset(self, dataset) }
+      @dataset_session.add_dataset(self, Class.new(Dataset::Base) {
+        define_method :load, block
+      }) unless block.nil?
     end
     
     def dataset_session
