@@ -7,10 +7,16 @@ module Dataset
       
       def clear
         ActiveRecord::Base.silence do
-          ActiveRecord::Base.send(:subclasses).each do |ar|
+          record_classes.each do |ar|
             ar.connection.delete "DELETE FROM #{ar.connection.quote_table_name(ar.table_name)}",
               "Dataset::Database#clear"
           end
+        end
+      end
+      
+      def record_classes
+        @record_classes ||= ActiveRecord::Base.send(:subclasses).select do |ar|
+          ar.connection.tables.include?(ar.table_name)
         end
       end
       
