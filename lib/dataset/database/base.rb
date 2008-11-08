@@ -6,17 +6,12 @@ module Dataset
       include FileUtils
       
       def clear
+        connection = ActiveRecord::Base.connection
         ActiveRecord::Base.silence do
-          record_classes.each do |ar|
-            ar.connection.delete "DELETE FROM #{ar.connection.quote_table_name(ar.table_name)}",
+          connection.tables.each do |table_name|
+            connection.delete "DELETE FROM #{connection.quote_table_name(table_name)}",
               "Dataset::Database#clear"
           end
-        end
-      end
-      
-      def record_classes
-        @record_classes ||= ActiveRecord::Base.send(:subclasses).select do |ar|
-          ar.connection.tables.include?(ar.table_name)
         end
       end
       
