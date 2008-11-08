@@ -10,7 +10,14 @@ require 'dataset/record/meta'
 require 'dataset/record/fixture'
 require 'dataset/record/model'
 
-require 'dataset/extensions/test_unit'
-
 module Dataset
+  def self.included(test_context)
+    if test_context.name =~ 'TestCase'
+      require 'dataset/extensions/test_unit'
+    elsif test_context.name =~ 'ExampleGroup'
+      require 'dataset/extensions/rspec'
+    else
+      raise "I don't understand your test framework"
+    end
+  end
 end
