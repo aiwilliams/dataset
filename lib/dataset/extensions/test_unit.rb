@@ -6,7 +6,7 @@ module Dataset
     end
     
     def run(result, &progress_block)
-      @test_class.dataset_session.load_datasets_for(@test_class)
+      @test_class.dataset_session.load_datasets_for(@test_class) if @test_class.dataset_session
       @suite.run(result, &progress_block)
     end
     
@@ -21,15 +21,15 @@ class Test::Unit::TestCase
     def suite_with_dataset
       Dataset::TestSuite.new(suite_without_dataset, self)
     end
-    alias suite_without_dataset suite
-    alias suite suite_with_dataset
+    alias_method_chain :suite, :dataset
     
     def dataset(dataset)
-      dataset_session.add_dataset(self, dataset)
+      @dataset_session ||= Dataset::Session.new(Dataset::Database::Base.new)
+      @dataset_session.add_dataset(self, dataset)
     end
     
     def dataset_session
-      @dataset_session ||= Dataset::Session.new(Dataset::Database::Base.new)
+      @dataset_session
     end
   end
   
