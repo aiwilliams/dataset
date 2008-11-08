@@ -7,6 +7,9 @@ module Dataset
     end
     
     def add_dataset(test_class, dataset)
+      if dataset.used_datasets
+        dataset.used_datasets.each { |used_dataset| self.add_dataset(test_class, used_dataset) }
+      end
       datasets_for(test_class) << dataset
     end
     

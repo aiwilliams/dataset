@@ -33,6 +33,16 @@ describe Dataset::Session do
       @session.datasets_for(TestCaseChild).should == [DatasetOne, DatasetTwo]
       @session.datasets_for(TestCaseGrandchild).should == [DatasetOne, DatasetTwo]
     end
+    
+    it 'should include those that a dataset declares it uses' do
+      dataset = Class.new(Dataset::Base) do
+        uses DatasetTwo, DatasetOne
+      end
+      @session.add_dataset TestCaseRoot, dataset
+      @session.add_dataset TestCaseChild, DatasetTwo
+      @session.datasets_for(TestCaseChild).should == [DatasetTwo, DatasetOne, dataset]
+      @session.datasets_for(TestCaseGrandchild).should == [DatasetTwo, DatasetOne, dataset]
+    end
   end
   
   describe 'dataset loading' do
