@@ -36,6 +36,26 @@ describe Dataset::Session do
   end
   
   describe 'dataset loading' do
+    it 'should clear the database on first load' do
+      @database.should_receive(:clear).once()
+      dataset_one = Class.new(Dataset::Base)
+      dataset_two = Class.new(Dataset::Base)
+      @session.add_dataset TestCaseRoot, dataset_one
+      @session.add_dataset TestCaseChild, dataset_one
+      @session.load_datasets_for(TestCaseRoot)
+      @session.load_datasets_for(TestCaseChild)
+    end
+    
+    it 'should clear the database on loads where there is no subset' do
+      @database.should_receive(:clear).twice()
+      dataset_one = Class.new(Dataset::Base)
+      dataset_two = Class.new(Dataset::Base)
+      @session.add_dataset TestCaseChild, dataset_one
+      @session.add_dataset TestCaseSibling, dataset_two
+      @session.load_datasets_for(TestCaseChild)
+      @session.load_datasets_for(TestCaseSibling)
+    end
+    
     it 'should happen in the order declared' do
       load_order = []
       

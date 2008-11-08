@@ -9,7 +9,7 @@ module Dataset
         ActiveRecord::Base.silence do
           ActiveRecord::Base.send(:subclasses).each do |ar|
             ar.connection.delete "DELETE FROM #{ar.connection.quote_table_name(ar.table_name)}",
-              "Dataset clear_data_from_database" rescue nil
+              "Dataset::Database#clear"
           end
         end
       end

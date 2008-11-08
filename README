@@ -7,6 +7,7 @@ make the dataset method available to tests in rspec
 raise error when instance_loaders can't find an id/model by symbolic name
 clear all dumps on new run of tests
 be sure we are capturing a dataset if it has already be captured before during a run
+describe what happens when someone has a fixtures file - they get loaded after our datasets, thereby causing all the data in the table of the fixture file (like things.yml) to be deleted - the fixtures are then loaded
 
 Dataset::Session.new
 describe Something do
