@@ -21,7 +21,7 @@ class Spec::Example::ExampleGroup
     
     def dataset_session_in_hierarchy
       self.dataset_session ||= begin
-        database_spec = ActiveRecord::Base.connection_pool.spec.config
+        database_spec = ActiveRecord::Base.configurations['test'].with_indifferent_access
         database_class = Dataset::Database.const_get(database_spec[:adapter].classify)
         database = database_class.new(database_spec, File.expand_path(RAILS_ROOT + '/spec/tmp'))
         Dataset::Session.new(database)

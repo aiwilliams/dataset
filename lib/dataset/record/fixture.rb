@@ -1,3 +1,5 @@
+require 'active_record/fixtures'
+
 module Dataset
   module Record
     
