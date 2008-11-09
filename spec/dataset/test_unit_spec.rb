@@ -1,6 +1,9 @@
 require File.expand_path(File.dirname(__FILE__)) + '/../spec_helper'
 
 require 'test/unit/testresult'
+class Test::Unit::TestCase
+  include Dataset
+end
 
 describe Test::Unit::TestCase do
   it 'should have a dataset method' do

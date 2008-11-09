@@ -1,6 +1,25 @@
 SPEC_ROOT = File.expand_path(File.dirname(__FILE__))
 require "#{SPEC_ROOT}/../plugit/descriptor"
 
+# From RSpec's spec_helper.rb. Useful to keep testing of ExampleGroup from
+# being overly noisy in the console output.
+share_as :SandboxedOptions do
+  attr_reader :options
+
+  before(:each) do
+    @original_rspec_options = ::Spec::Runner.options
+    ::Spec::Runner.use(@options = ::Spec::Runner::Options.new(StringIO.new, StringIO.new))
+  end
+
+  after(:each) do
+    ::Spec::Runner.use(@original_rspec_options)
+  end
+
+  def run_with(options)
+    ::Spec::Runner::CommandLine.run(options)
+  end
+end
+
 $LOAD_PATH << "#{SPEC_ROOT}/../lib"
 RAILS_ROOT = "#{SPEC_ROOT}/.."
 RAILS_LOG_FILE = "#{RAILS_ROOT}/log/test.log"

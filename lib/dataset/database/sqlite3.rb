@@ -1,8 +1,8 @@
 module Dataset
   module Database
     class Sqlite3 < Base
-      def initialize(database_path, storage_path)
-        @database_path, @storage_path = database_path, storage_path
+      def initialize(database_spec, storage_path)
+        @database_path, @storage_path = database_spec[:database], storage_path
       end
       
       def capture(datasets)

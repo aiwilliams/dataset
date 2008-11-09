@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__)) + '/../spec_helper'
 
 describe Dataset::SessionBinding do
   before :all do
-    @database = Dataset::Database::Sqlite3.new(SQLITE_DATABASE, "#{SPEC_ROOT}/tmp")
+    @database = Dataset::Database::Sqlite3.new({:database => SQLITE_DATABASE}, "#{SPEC_ROOT}/tmp")
   end
   
   before do

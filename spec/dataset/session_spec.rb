@@ -10,7 +10,7 @@ DatasetTwo = Class.new(Dataset::Base)
 
 describe Dataset::Session do
   before do
-    @database = Dataset::Database::Sqlite3.new(SQLITE_DATABASE, "#{SPEC_ROOT}/tmp")
+    @database = Dataset::Database::Sqlite3.new({:database => SQLITE_DATABASE}, "#{SPEC_ROOT}/tmp")
     @session = Dataset::Session.new(@database)
   end
   
