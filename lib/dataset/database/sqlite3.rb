@@ -14,7 +14,7 @@ module Dataset
         store = storage_path(datasets)
         if File.file?(store)
           mv store, @database_path
-          ActiveRecord::Base.establish_connection 'sqlite3'
+          ActiveRecord::Base.establish_connection 'test'
           true
         end
       end

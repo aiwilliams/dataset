@@ -36,11 +36,11 @@ RAILS_DEFAULT_LOGGER = Logger.new(RAILS_LOG_FILE)
 RAILS_DEFAULT_LOGGER.level = Logger::DEBUG
 
 ActiveRecord::Base.silence do
-  ActiveRecord::Base.configurations = {'sqlite3' => {
+  ActiveRecord::Base.configurations = {'test' => {
     'adapter' => 'sqlite3',
     'database' => SQLITE_DATABASE
   }}
-  ActiveRecord::Base.establish_connection 'sqlite3'
+  ActiveRecord::Base.establish_connection 'test'
   load "#{SPEC_ROOT}/schema.rb"
 end
 
