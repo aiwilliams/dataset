@@ -10,11 +10,15 @@ class Spec::Example::ExampleGroup
       }) unless block.nil?
       
       load = nil
+      
       before(:all) do
         load = dataset_session.load_datasets_for(self.class)
+        self.extend load.dataset_binding.record_methods
         self.extend load.dataset_binding.instance_loaders
       end
+      
       before(:each) do
+        self.extend load.dataset_binding.record_methods
         self.extend load.dataset_binding.instance_loaders
       end
     end

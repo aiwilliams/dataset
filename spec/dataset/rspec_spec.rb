@@ -64,28 +64,38 @@ describe Spec::Example::ExampleGroup do
     created_model = nil
     dataset = Class.new(Dataset::Base) do
       define_method(:load) do
-        created_model = create_model(Thing, :mything)
+        created_model = create_model(Thing, :dataset_thing)
       end
     end
     
-    found_in_before_all, found_in_it = nil
+    found_in_before_all, dataset_thing_in_example = nil
+    created_in_before_all, before_all_thing_in_example = nil
+    created_in_example = nil
     group = Class.new(Spec::Example::ExampleGroup) do
       self.dataset(dataset)
       before(:all) do
-        found_in_before_all = things(:mything)
+        found_in_before_all = things(:dataset_thing)
+        created_in_before_all = create_model(Thing, :before_all_thing)
       end
       it 'one' do
-        found_in_it = things(:mything)
+        dataset_thing_in_example = things(:dataset_thing)
+        before_all_thing_in_example = things(:before_all_thing)
+        created_in_example = create_model(Thing)
       end
     end
     
     group.run
     group.should_not respond_to(:things)
     
-    found_in_it.should_not be_nil
-    found_in_it.should == created_model
+    dataset_thing_in_example.should_not be_nil
+    dataset_thing_in_example.should == created_model
     
     found_in_before_all.should_not be_nil
     found_in_before_all.should == created_model
+    
+    created_in_before_all.should_not be_nil
+    before_all_thing_in_example.should == created_in_before_all
+    
+    created_in_example.should_not be_nil
   end
 end
