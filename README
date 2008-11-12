@@ -1,69 +1,13 @@
-clear all dumps on new run of tests
-be sure we are capturing a dataset if it has already be captured before during a run
-describe what happens when someone has a fixtures file - they get loaded after our datasets, thereby causing all the data in the table of the fixture file (like things.yml) to be deleted - the fixtures are then loaded
-look into truncating database instead individual table deletes
-allow configuration of dataset
-  * permatable / global scope
+== Dataset: Data for Your Tests
 
-Dataset::Session.new
-describe Something do
-  dataset :a
-  
-  it 'should whatever'
-  end
-  
-  describe More do
-    dataset :b
-    
-    it 'should'
-    end
-  end
-  
-  describe Another do
-    it 'should'
-    end
-  end
-  
-end
+Dataset is...
 
-Dataset::Session.new
-describe Something do
-  dataset :a
-  
-  it 'should whatever'
-  end
-  
-  describe More do
-    dataset :b
-    
-    it 'should'
-    end
-  end
-  
-  describe Another do
-    it 'should'
-    end
-  end
-  
-end
+How is it different from other solutions? A few things:
 
+ * 
 
-            Something(:a)
-            
-      More(:a,:b)       Another(:a)
-      
-      
-      
-Something  {:a}         (:a).load
-More       {:a,:b}      (:b).load
-Another    {:a}         (:b).unload  (restore :a)
+=== Quick Start
 
-This can be confusing. Refer to documentation of 'superset' on wikipedia
-{:a}.superset?({:a,:b})
+=== License
 
-Something.superclass?(More)
-
-
-definition of test classes where dataset usage is declared
-running the tests, at which point we must extend the instances to have the data reading methods, creation methods
-  during the run, the test methods should have access to the data that was created
+Dataset is released under the MIT-License and is Copyright (c)2008 Adam Williams.

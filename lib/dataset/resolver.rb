@@ -19,7 +19,7 @@ module Dataset
     
     protected
       def resolve_identifier(identifier)
-        names = [identifier.to_s.camelize, identifier.to_s.camelize + 'Dataset']
+        names = [identifier.to_s.camelize, identifier.to_s.camelize + suffix]
         constant = resolve_these(names)
         unless constant
           raise Dataset::DatasetNotFound, "Could not find a dataset #{names.collect{|n| "'#{n}'"}.join(' or ')}."
@@ -34,6 +34,10 @@ module Dataset
           return constant if constant
         end
         nil
+      end
+      
+      def suffix
+        @suffix ||= 'Dataset'
       end
   end
   
@@ -50,9 +54,9 @@ module Dataset
       def resolve_identifier(identifier)
         file = File.join(@path, identifier.to_s)
         unless File.exists?(file + '.rb')
-          file = file + '_dataset'
+          file = file + '_' + file_suffix
           unless File.exists?(file + '.rb')
-            raise DatasetNotFound, "Could not find a dataset file in '#{@path}' having the name '#{identifier}.rb' or '#{identifier}_dataset.rb'."
+            raise DatasetNotFound, "Could not find a dataset file in '#{@path}' having the name '#{identifier}.rb' or '#{identifier}_#{file_suffix}.rb'."
           end
         end
         require file
@@ -61,6 +65,10 @@ module Dataset
         rescue Dataset::DatasetNotFound => dnf
           raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}', but it did not define #{dnf.message.sub('Could not find ', '')}"
         end
+      end
+      
+      def file_suffix
+        @file_suffix ||= suffix.downcase
       end
   end
   
