@@ -1,4 +1,10 @@
 module Dataset
+  class RecordNotFound < StandardError
+    def initialize(record_type, symbolic_name)
+      super "There is no '#{record_type.name}' found for the symbolic name ':#{symbolic_name}'."
+    end
+  end
+  
   class SessionBinding
     attr_reader :database, :parent_binding
     attr_reader :instance_loaders, :record_methods
@@ -31,6 +37,8 @@ module Dataset
         local_id
       elsif !parent_binding.nil?
         parent_binding.find_id record_type, symbolic_name
+      else
+        raise RecordNotFound.new(record_type, symbolic_name)
       end
     end
     
@@ -40,6 +48,8 @@ module Dataset
         record_class.find local_id
       elsif !parent_binding.nil?
         parent_binding.find_model record_type, symbolic_name
+      else
+        raise RecordNotFound.new(record_type, symbolic_name)
       end
     end
     

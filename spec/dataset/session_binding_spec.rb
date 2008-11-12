@@ -100,5 +100,15 @@ describe Dataset::SessionBinding do
     it 'should walk up the tree to find models' do
       @nested_scope.find_model(Thing, :mything).should == @binding.find_model(Thing, :mything)
     end
+    
+    it 'should raise an error if an object cannot be found for a name' do
+      lambda do
+        @nested_scope.find_model(Thing, :yourthing)
+      end.should raise_error(Dataset::RecordNotFound, "There is no 'Thing' found for the symbolic name ':yourthing'.")
+      
+      lambda do
+        @nested_scope.find_id(Thing, :yourthing)
+      end.should raise_error(Dataset::RecordNotFound, "There is no 'Thing' found for the symbolic name ':yourthing'.")
+    end
   end
 end
