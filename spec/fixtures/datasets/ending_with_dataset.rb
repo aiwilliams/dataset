@@ -1,0 +1,2 @@
+class EndingWithDataset
+end

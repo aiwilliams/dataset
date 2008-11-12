@@ -1,12 +1,16 @@
 module Dataset
   class Session
-    def initialize(database)
+    attr_accessor :dataset_resolver
+    
+    def initialize(database, dataset_resolver = Resolver.default)
       @database = database
+      @dataset_resolver = dataset_resolver
       @datasets = Hash.new
       @load_stack = []
     end
     
-    def add_dataset(test_class, dataset)
+    def add_dataset(test_class, dataset_identifier)
+      dataset = dataset_resolver.resolve(dataset_identifier)
       if dataset.used_datasets
         dataset.used_datasets.each { |used_dataset| self.add_dataset(test_class, used_dataset) }
       end

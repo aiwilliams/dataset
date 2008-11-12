@@ -43,6 +43,17 @@ describe Dataset::Session do
       @session.datasets_for(TestCaseChild).should == [DatasetTwo, DatasetOne, dataset]
       @session.datasets_for(TestCaseGrandchild).should == [DatasetTwo, DatasetOne, dataset]
     end
+    
+    it 'should accept a dataset name' do
+      @session.add_dataset TestCaseRoot, :dataset_one
+      @session.datasets_for(TestCaseRoot).should == [DatasetOne]
+      
+      dataset = Class.new(Dataset::Base) do
+        uses :dataset_two, :dataset_one
+      end
+      @session.add_dataset TestCaseChild, dataset
+      @session.datasets_for(TestCaseChild).should == [DatasetOne, DatasetTwo, dataset]
+    end
   end
   
   describe 'dataset loading' do
@@ -165,12 +176,12 @@ describe Dataset::Session do
   
   describe 'bindings' do
     it 'should be created for each dataset load, wrapping the outer binding' do
-      scope_one   = Dataset::SessionBinding.new(@database)
-      scope_two   = Dataset::SessionBinding.new(scope_one)
-      scope_three = Dataset::SessionBinding.new(scope_one)
+      binding_one   = Dataset::SessionBinding.new(@database)
+      binding_two   = Dataset::SessionBinding.new(binding_one)
+      binding_three = Dataset::SessionBinding.new(binding_one)
       
-      Dataset::SessionBinding.should_receive(:new).with(@database).and_return(scope_one)
-      Dataset::SessionBinding.should_receive(:new).with(scope_one).twice().and_return(scope_two)
+      Dataset::SessionBinding.should_receive(:new).with(@database).and_return(binding_one)
+      Dataset::SessionBinding.should_receive(:new).with(binding_one).twice().and_return(binding_two)
       
       dataset_one = Class.new(Dataset::Base) { define_method :load do; end }
       dataset_two = Class.new(Dataset::Base) { define_method :load do; end }
