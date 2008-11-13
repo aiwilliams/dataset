@@ -41,6 +41,25 @@ class Test::Unit::TestCase
       dataset_session.add_dataset(self, Class.new(Dataset::Base) {
         define_method :load, block
       }) unless block.nil?
+      
+      # Unfortunately, if we have rspec loaded, TestCase has it's suite method
+      # modified for the test/unit runners, but uses a different mechanism to
+      # collect tests if the rspec runners are used.
+      if included_modules.find {|m| m.name =~ /ExampleGroupMethods\Z/}
+        load = nil
+        before(:all) do
+          load = dataset_session.load_datasets_for(self.class)
+          self.extend load.dataset_binding.record_methods
+          self.extend load.dataset_binding.instance_loaders
+          self.extend load.helper_methods
+        end
+        
+        before(:each) do
+          self.extend load.dataset_binding.record_methods
+          self.extend load.dataset_binding.instance_loaders
+          self.extend load.helper_methods
+        end
+      end
     end
     
     def dataset_session_in_hierarchy
