@@ -29,7 +29,7 @@ module Dataset
         if last_load.datasets.subset?(datasets)
           @database.capture(last_load.datasets)
           current_load = Load.new(datasets, last_load.dataset_binding)
-          current_load.execute(last_load.datasets)
+          current_load.execute(last_load.datasets, @dataset_resolver)
           @load_stack.push(current_load)
         else
           @load_stack.pop
@@ -40,7 +40,7 @@ module Dataset
       else
         @database.clear
         current_load = Load.new(datasets, @database)
-        current_load.execute([])
+        current_load.execute([], @dataset_resolver)
         @load_stack.push(current_load)
       end
       current_load

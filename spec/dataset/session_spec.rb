@@ -35,13 +35,16 @@ describe Dataset::Session do
     end
     
     it 'should include those that a dataset declares it uses' do
-      dataset = Class.new(Dataset::Base) do
-        uses DatasetTwo, DatasetOne
+      dataset_one = Class.new(Dataset::Base) do
+        uses DatasetTwo
       end
-      @session.add_dataset TestCaseRoot, dataset
+      dataset_two = Class.new(Dataset::Base) do
+        uses dataset_one, DatasetOne
+      end
+      @session.add_dataset TestCaseRoot, dataset_two
       @session.add_dataset TestCaseChild, DatasetTwo
-      @session.datasets_for(TestCaseChild).should == [DatasetTwo, DatasetOne, dataset]
-      @session.datasets_for(TestCaseGrandchild).should == [DatasetTwo, DatasetOne, dataset]
+      @session.datasets_for(TestCaseChild).should == [DatasetTwo, dataset_one, DatasetOne, dataset_two]
+      @session.datasets_for(TestCaseGrandchild).should == [DatasetTwo, dataset_one, DatasetOne, dataset_two]
     end
     
     it 'should accept a dataset name' do
@@ -95,6 +98,71 @@ describe Dataset::Session do
       @session.add_dataset TestCaseRoot, dataset_one
       @session.load_datasets_for TestCaseRoot
       load_order.should == [dataset_two, dataset_one]
+    end
+    
+    it 'should install dataset helpers into defining dataset, and not cross into other datasets' do
+      dataset_instances = []
+      dataset_one = Class.new(Dataset::Base) {
+        helpers do
+          def helper_one; end
+        end
+        define_method :load do
+          dataset_instances << self
+        end
+      }
+      dataset_two = Class.new(Dataset::Base) {
+        helpers do
+          def helper_two; end
+        end
+        define_method :load do
+          dataset_instances << self
+        end
+      }
+      @session.add_dataset TestCaseRoot, dataset_one
+      @session.add_dataset TestCaseRoot, dataset_two
+      @session.load_datasets_for TestCaseRoot
+      dataset_instances.first.should respond_to(:helper_one)
+      dataset_instances.first.should_not respond_to(:helper_two)
+      dataset_instances.last.should_not respond_to(:helper_one)
+      dataset_instances.last.should respond_to(:helper_two)
+      
+      dataset_one.instance_methods.should include('helper_one')
+      dataset_one.instance_methods.should_not include('helper_two')
+      dataset_two.instance_methods.should_not include('helper_one')
+      dataset_two.instance_methods.should include('helper_two')
+    end
+    
+    it 'should install dataset helpers into datasets that are using another' do
+      dataset_instances = []
+      dataset_one = Class.new(Dataset::Base) {
+        helpers do
+          def helper_one; end
+        end
+        define_method :load do
+          dataset_instances << self
+        end
+      }
+      dataset_two = Class.new(Dataset::Base) {
+        uses dataset_one
+        helpers do
+          def helper_two; end
+        end
+        define_method :load do
+          dataset_instances << self
+        end
+      }
+      @session.add_dataset TestCaseRoot, dataset_one
+      @session.add_dataset TestCaseRoot, dataset_two
+      @session.load_datasets_for TestCaseRoot
+      dataset_instances.first.should respond_to(:helper_one)
+      dataset_instances.first.should_not respond_to(:helper_two)
+      dataset_instances.last.should respond_to(:helper_one)
+      dataset_instances.last.should respond_to(:helper_two)
+      
+      dataset_one.instance_methods.should include('helper_one')
+      dataset_one.instance_methods.should_not include('helper_two')
+      dataset_two.instance_methods.should_not include('helper_one')
+      dataset_two.instance_methods.should include('helper_two')
     end
     
     it 'should happen only once per test in a hierarchy' do

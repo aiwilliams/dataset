@@ -1,3 +1,4 @@
+should have helper methods in dataset that get installed into examples
 add ability to name custom models - see code below
 clear all dumps on new run of tests
 be sure we are capturing a dataset if it has already be captured before during a run
