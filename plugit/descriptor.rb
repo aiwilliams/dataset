@@ -2,7 +2,6 @@ require 'rubygems'
 require 'plugit'
 
 PLUGIT_ROOT = File.expand_path(File.dirname(__FILE__))
-$LOAD_PATH << SPEC_ROOT # for application.rb
 
 Plugit.describe do |dataset|
   dataset.environments_root_path = "#{PLUGIT_ROOT}/environments"

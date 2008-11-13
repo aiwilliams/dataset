@@ -20,8 +20,9 @@ share_as :SandboxedOptions do
   end
 end
 
-$LOAD_PATH << "#{SPEC_ROOT}/../lib"
+$LOAD_PATH << SPEC_ROOT
 RAILS_ROOT = "#{SPEC_ROOT}/.."
+$LOAD_PATH << "#{RAILS_ROOT}/lib"
 RAILS_LOG_FILE = "#{RAILS_ROOT}/log/test.log"
 SQLITE_DATABASE = "#{SPEC_ROOT}/sqlite3.db"
 

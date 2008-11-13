@@ -43,6 +43,36 @@ describe Test::Unit::TestCase do
     sessions.uniq.size.should be(1)
   end
   
+  it 'should load datasets within class hiearchy' do
+    dataset_one = Class.new(Dataset::Base) do
+      define_method(:load) do
+        Thing.create!
+      end
+    end
+    dataset_two = Class.new(Dataset::Base) do
+      define_method(:load) do
+        Place.create!
+      end
+    end
+    
+    testcase = Class.new(Test::Unit::TestCase) do
+      dataset(dataset_one)
+      def test_one; end
+    end
+    testcase_child = Class.new(testcase) do
+      dataset(dataset_two)
+      def test_two; end
+    end
+    
+    run_testcase(testcase)
+    Thing.count.should be(1)
+    Place.count.should be(0)
+    
+    run_testcase(testcase_child)
+    Thing.count.should be(1)
+    Place.count.should be(1)
+  end
+  
   it 'should forward blocks passed in to the dataset method' do
     load_count = 0
     testcase = Class.new(Test::Unit::TestCase) do
