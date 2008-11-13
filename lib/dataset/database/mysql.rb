@@ -20,6 +20,10 @@ module Dataset
           true
         end
       end
+      
+      def storage_path(datasets)
+        "#{@storage_path}/#{datasets.collect {|c| c.__id__}.join('_')}.sql"
+      end
     end
   end
 end
