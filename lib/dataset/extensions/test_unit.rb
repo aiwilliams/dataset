@@ -14,6 +14,7 @@ module Dataset
         load = dataset_session.load_datasets_for(@test_class)
         @suite.tests.each do |test_instance|
           test_instance.extend load.dataset_binding.instance_loaders
+          test_instance.extend load.helper_methods
         end
       end
       @suite.run(result, &progress_block)

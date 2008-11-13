@@ -60,7 +60,7 @@ describe Spec::Example::ExampleGroup do
     Place.count.should be(1)
   end
   
-  it 'should expose data reading methods from dataset binding to the test methods through the test instances' do
+  it 'should expose data reading methods from dataset binding to the test methods through the group instances' do
     created_model = nil
     dataset = Class.new(Dataset::Base) do
       define_method(:load) do
@@ -97,5 +97,41 @@ describe Spec::Example::ExampleGroup do
     before_all_thing_in_example.should == created_in_before_all
     
     created_in_example.should_not be_nil
+  end
+  
+  it 'should expose dataset helper methods to the test methods through the group instances' do
+    dataset_one = Class.new(Dataset::Base) do
+      helpers do
+        def helper_one; end
+      end
+      def load; end
+    end
+    dataset_two = Class.new(Dataset::Base) do
+      uses dataset_one
+      helpers do
+        def helper_two; end
+      end
+      def load; end
+    end
+    
+    group_before_all_instance, group_example_instance = nil
+    group = Class.new(Spec::Example::ExampleGroup) do
+      self.dataset(dataset_two)
+      before(:all) do
+        group_before_all_instance = self
+      end
+      it 'one' do
+        group_example_instance = self
+      end
+    end
+    
+    group.run
+    
+    group.should_not respond_to(:helper_one)
+    group.should_not respond_to(:helper_two)
+    group_before_all_instance.should respond_to(:helper_one)
+    group_before_all_instance.should respond_to(:helper_two)
+    group_example_instance.should respond_to(:helper_one)
+    group_example_instance.should respond_to(:helper_two)
   end
 end

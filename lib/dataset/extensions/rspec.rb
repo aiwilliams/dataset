@@ -15,11 +15,13 @@ class Spec::Example::ExampleGroup
         load = dataset_session.load_datasets_for(self.class)
         self.extend load.dataset_binding.record_methods
         self.extend load.dataset_binding.instance_loaders
+        self.extend load.helper_methods
       end
       
       before(:each) do
         self.extend load.dataset_binding.record_methods
         self.extend load.dataset_binding.instance_loaders
+        self.extend load.helper_methods
       end
     end
     

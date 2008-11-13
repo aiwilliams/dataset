@@ -107,6 +107,37 @@ describe Test::Unit::TestCase do
     found_model.should == created_model
   end
   
+  it 'should expose dataset helper methods to the test methods through the test instances' do
+    dataset_one = Class.new(Dataset::Base) do
+      helpers do
+        def helper_one; end
+      end
+      def load; end
+    end
+    dataset_two = Class.new(Dataset::Base) do
+      uses dataset_one
+      helpers do
+        def helper_two; end
+      end
+      def load; end
+    end
+    
+    test_instance = nil
+    testcase = Class.new(Test::Unit::TestCase) do
+      self.dataset(dataset_two)
+      define_method :test_instance_loaders do
+        test_instance = self
+      end
+    end
+    
+    run_testcase(testcase)
+    
+    testcase.should_not respond_to(:helper_one)
+    testcase.should_not respond_to(:helper_two)
+    test_instance.should respond_to(:helper_one)
+    test_instance.should respond_to(:helper_two)
+  end
+  
   def run_testcase(testcase)
     result = Test::Unit::TestResult.new
     testcase.suite.run(result) {}
