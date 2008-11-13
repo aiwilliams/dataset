@@ -45,7 +45,7 @@ class Test::Unit::TestCase
       # Unfortunately, if we have rspec loaded, TestCase has it's suite method
       # modified for the test/unit runners, but uses a different mechanism to
       # collect tests if the rspec runners are used.
-      if included_modules.find {|m| m.name =~ /ExampleGroupMethods\Z/}
+      if included_modules.find {|m| m.name =~ /ExampleMethods\Z/}
         load = nil
         before(:all) do
           load = dataset_session.load_datasets_for(self.class)
