@@ -246,6 +246,7 @@ describe Dataset::Session do
       instance_of_dataset_one.should_not be_nil
       instance_of_dataset_one.should respond_to(:create_record)
       instance_of_dataset_one.should respond_to(:create_model)
+      instance_of_dataset_one.should respond_to(:name_model)
       instance_of_dataset_one.should respond_to(:find_model)
       instance_of_dataset_one.should respond_to(:find_id)
     end

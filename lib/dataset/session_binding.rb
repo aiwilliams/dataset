@@ -54,6 +54,13 @@ module Dataset
       end
     end
     
+    def name_model(record, symbolic_name)
+      record_class = record.class.base_class
+      @instance_loaders.create_loader(record_class) unless @symbolic_names_to_ids.has_key?(record_class)
+      @symbolic_names_to_ids[record_class][symbolic_name] = record.id
+      record
+    end
+    
     protected
       def insert(dataset_record_class, record_type, *args)
         symbolic_name, attributes = extract_creation_arguments args
@@ -113,7 +120,7 @@ module Dataset
       
       def new_record_methods_module
         mod = Module.new do
-          delegate :create_record, :create_model, :find_id, :find_model,
+          delegate :create_record, :create_model, :find_id, :find_model, :name_model,
             :to => :dataset_session_binding
         end
         

@@ -1,37 +1,10 @@
 add ability to clear the database (some tests wanted to guarantee a clear db)
-add ability to name custom models - see code below
 clear all dumps on new run of tests
 be sure we are capturing a dataset if it has already be captured before during a run
 describe what happens when someone has a fixtures file - they get loaded after our datasets, thereby causing all the data in the table of the fixture file (like things.yml) to be deleted - the fixtures are then loaded
 look into truncating database instead individual table deletes
 allow configuration of dataset
   * permatable / global scope
-
-  module Scenarios
-    module TableMethods
-      # TODO Move to Scenarios plugin to support naming custom models
-      def name_model(model, symbolic_name)
-        table_config.update_table_readers(CustomModel.new(model, symbolic_name))
-        self.extend table_config.table_readers
-      end
-
-      class CustomModel
-        attr_reader :model, :record_meta, :symbolic_name
-        delegate :id, :to => :model
-
-        def initialize(model, symbolic_name)
-          @model         = model
-          @record_meta   = Scenarios::TableMethods::RecordMeta.new(model.class.base_class)
-          @symbolic_name = symbolic_name
-        end
-
-        def to_model
-          @model
-        end
-      end
-    end
-  end
-
 
 Dataset::Session.new
 describe Something do

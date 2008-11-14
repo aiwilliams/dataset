@@ -91,6 +91,14 @@ describe Dataset::SessionBinding do
     end
   end
   
+  describe 'name_model' do
+    it 'should allow assigning a name to a model for later lookup' do
+      thing = Thing.create!
+      @binding.name_model(thing, :mything)
+      @binding.find_model(Thing, :mything).should == thing
+    end
+  end
+  
   describe 'nested bindings' do
     before do
       @binding.create_model Thing, :mything, :name => 'my thing'
