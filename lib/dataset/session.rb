@@ -26,7 +26,9 @@ module Dataset
     def load_datasets_for(test_class)
       datasets = datasets_for(test_class)
       if last_load = @load_stack.last
-        if last_load.datasets.subset?(datasets)
+        if last_load.datasets == datasets
+          current_load = Reload.new(last_load)
+        elsif last_load.datasets.subset?(datasets)
           @database.capture(last_load.datasets)
           current_load = Load.new(datasets, last_load.dataset_binding)
           current_load.execute(last_load.datasets, @dataset_resolver)

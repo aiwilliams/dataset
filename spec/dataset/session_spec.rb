@@ -80,6 +80,15 @@ describe Dataset::Session do
       @session.load_datasets_for(TestCaseSibling)
     end
     
+    it 'should not capture the dataset if it is the same as the last loaded' do
+      @database.should_not_receive(:capture)
+      dataset_one = Class.new(Dataset::Base)
+      @session.add_dataset TestCaseRoot, dataset_one
+      @session.load_datasets_for(TestCaseRoot)
+      @session.load_datasets_for(TestCaseChild)
+      @session.load_datasets_for(TestCaseSibling)
+    end
+    
     it 'should happen in the order declared' do
       load_order = []
       
