@@ -8,17 +8,20 @@ module Dataset
   class SessionBinding
     attr_reader :database, :parent_binding
     attr_reader :instance_loaders, :record_methods
+    attr_reader :block_variables
     
     def initialize(database_or_parent_binding)
       @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
       @record_methods = new_record_methods_module
       @instance_loaders = new_instance_loaders_module
+      @block_variables = Hash.new
       
       case database_or_parent_binding
       when Dataset::SessionBinding
         @parent_binding = database_or_parent_binding
         @database = parent_binding.database
         @instance_loaders.module_eval { include database_or_parent_binding.instance_loaders }
+        @block_variables.update(database_or_parent_binding.block_variables)
       else 
         @database = database_or_parent_binding
       end

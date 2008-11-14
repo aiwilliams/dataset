@@ -264,6 +264,16 @@ describe Dataset::Session do
       @session.load_datasets_for TestCaseRoot
       instance_of_dataset_one.should respond_to(:things)
     end
+    
+    it 'should copy instance variables assigned in dataset blocks to binding' do
+      @session.add_dataset(TestCaseRoot, Class.new(Dataset::Block) {
+        define_method :doload do
+          @myvar = 'Hello'
+        end
+      })
+      load = @session.load_datasets_for(TestCaseRoot)
+      load.dataset_binding.block_variables['@myvar'].should == 'Hello'
+    end
   end
   
   describe 'bindings' do

@@ -1,3 +1,5 @@
+capture instance variable assigned in dataset block. move them to the binding. any instance variables in binding should be moved to test instances.
+
 add ability to clear the database (some tests wanted to guarantee a clear db)
 clear all dumps on new run of tests
 be sure we are capturing a dataset if it has already be captured before during a run
@@ -5,6 +7,7 @@ describe what happens when someone has a fixtures file - they get loaded after o
 look into truncating database instead individual table deletes
 allow configuration of dataset
   * permatable / global scope
+re-evaluation location of some tests that depend on TestCase in non-test/unit tests
 
 Dataset::Session.new
 describe Something do

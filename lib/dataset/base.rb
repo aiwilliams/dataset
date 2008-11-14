@@ -59,4 +59,13 @@ module Dataset
     
     def load; end
   end
+  
+  class Block < Base
+    def load
+      doload
+      instance_variables.each do |name|
+        dataset_session_binding.block_variables[name] = instance_variable_get(name)
+      end
+    end
+  end
 end

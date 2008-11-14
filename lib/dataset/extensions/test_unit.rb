@@ -38,8 +38,8 @@ class Test::Unit::TestCase
     def dataset(*datasets, &block)
       dataset_session = dataset_session_in_hierarchy
       datasets.each { |dataset| dataset_session.add_dataset(self, dataset) }
-      dataset_session.add_dataset(self, Class.new(Dataset::Base) {
-        define_method :load, block
+      dataset_session.add_dataset(self, Class.new(Dataset::Block) {
+        define_method :doload, block
       }) unless block.nil?
       
       # Unfortunately, if we have rspec loaded, TestCase has it's suite method
