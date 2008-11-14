@@ -135,13 +135,6 @@ describe Test::Unit::TestCase do
     testcase.should_not respond_to(:things)
     found_model.should_not be_nil
     found_model.should == created_model
-    
-    found_model = nil
-    testcase_child = Class.new(testcase)
-    run_testcase(testcase_child)
-    testcase_child.should_not respond_to(:things)
-    found_model.should_not be_nil
-    found_model.should == created_model
   end
   
   it 'should expose dataset helper methods to the test methods through the test instances' do

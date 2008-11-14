@@ -94,21 +94,27 @@ describe Dataset::SessionBinding do
   describe 'nested bindings' do
     before do
       @binding.create_model Thing, :mything, :name => 'my thing'
-      @nested_scope = Dataset::SessionBinding.new(@binding)
+      @nested_binding = Dataset::SessionBinding.new(@binding)
     end
     
     it 'should walk up the tree to find models' do
-      @nested_scope.find_model(Thing, :mything).should == @binding.find_model(Thing, :mything)
+      @nested_binding.find_model(Thing, :mything).should == @binding.find_model(Thing, :mything)
     end
     
     it 'should raise an error if an object cannot be found for a name' do
       lambda do
-        @nested_scope.find_model(Thing, :yourthing)
+        @nested_binding.find_model(Thing, :yourthing)
       end.should raise_error(Dataset::RecordNotFound, "There is no 'Thing' found for the symbolic name ':yourthing'.")
       
       lambda do
-        @nested_scope.find_id(Thing, :yourthing)
+        @nested_binding.find_id(Thing, :yourthing)
       end.should raise_error(Dataset::RecordNotFound, "There is no 'Thing' found for the symbolic name ':yourthing'.")
+    end
+    
+    it 'should have instance loader methods from parent binding' do
+      anything = Object.new
+      anything.extend @nested_binding.instance_loaders
+      anything.things(:mything).should_not be_nil
     end
   end
 end
