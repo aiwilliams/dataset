@@ -55,7 +55,7 @@ describe Dataset::SessionBinding do
       Thing.last.updated_on.should_not be_nil
     end
     
-    it 'should provide an instance loader methods for created types' do
+    it 'should provide instance loader methods for created types' do
       id = @binding.create_record(Note, :mynote)
       anything = Object.new
       anything.extend @binding.instance_loaders
@@ -82,7 +82,7 @@ describe Dataset::SessionBinding do
       person.last_name.should == 'Williams'
     end
     
-    it 'should provide an instance loader methods for created types' do
+    it 'should provide instance loader methods for created types' do
       note = @binding.create_model Note, :mynote
       anything = Object.new
       anything.extend @binding.instance_loaders

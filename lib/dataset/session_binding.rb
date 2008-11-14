@@ -10,17 +10,18 @@ module Dataset
     attr_reader :instance_loaders, :record_methods
     
     def initialize(database_or_parent_binding)
+      @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
+      @record_methods = new_record_methods_module
+      @instance_loaders = new_instance_loaders_module
+      
       case database_or_parent_binding
       when Dataset::SessionBinding
         @parent_binding = database_or_parent_binding
         @database = parent_binding.database
+        @instance_loaders.module_eval { include database_or_parent_binding.instance_loaders }
       else 
         @database = database_or_parent_binding
       end
-      
-      @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
-      @record_methods = new_record_methods_module
-      @instance_loaders = new_instance_loaders_module
     end
     
     def create_model(record_type, *args)
