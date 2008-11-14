@@ -12,6 +12,7 @@ module Dataset
       (datasets - loaded_datasets).each do |dataset|
         instance = dataset.new
         instance.extend dataset_binding.record_methods
+        instance.extend dataset_binding.instance_loaders
         used_datasets(dataset, dataset_resolver).each do |ds|
           next unless ds.helper_methods
           instance.extend ds.helper_methods

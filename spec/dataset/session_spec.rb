@@ -249,6 +249,20 @@ describe Dataset::Session do
       instance_of_dataset_one.should respond_to(:find_model)
       instance_of_dataset_one.should respond_to(:find_id)
     end
+    
+    it 'should install the instance loader methods into the dataset instance' do
+      instance_of_dataset_one = nil
+      dataset_one = Class.new(Dataset::Base) do
+        define_method :load do
+          create_record(Thing)
+          instance_of_dataset_one = self
+        end
+      end
+      
+      @session.add_dataset TestCaseRoot, dataset_one
+      @session.load_datasets_for TestCaseRoot
+      instance_of_dataset_one.should respond_to(:things)
+    end
   end
   
   describe 'bindings' do
