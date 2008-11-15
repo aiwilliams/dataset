@@ -12,10 +12,7 @@ module Dataset
     def run(result, &progress_block)
       if dataset_session
         load = dataset_session.load_datasets_for(@test_class)
-        @suite.tests.each do |test_instance|
-          test_instance.extend load.dataset_binding.instance_loaders
-          test_instance.extend load.helper_methods
-        end
+        @suite.tests.each { |e| e.extend_from_dataset_load(load) }
       end
       @suite.run(result, &progress_block)
     end
@@ -27,8 +24,6 @@ module Dataset
 end
 
 class Test::Unit::TestCase
-  superclass_delegating_accessor :dataset_session
-  
   class << self
     def suite_with_dataset
       Dataset::TestSuite.new(suite_without_dataset, self)
@@ -36,11 +31,7 @@ class Test::Unit::TestCase
     alias_method_chain :suite, :dataset
     
     def dataset(*datasets, &block)
-      dataset_session = dataset_session_in_hierarchy
-      datasets.each { |dataset| dataset_session.add_dataset(self, dataset) }
-      dataset_session.add_dataset(self, Class.new(Dataset::Block) {
-        define_method :doload, block
-      }) unless block.nil?
+      add_dataset(*datasets, &block)
       
       # Unfortunately, if we have rspec loaded, TestCase has it's suite method
       # modified for the test/unit runners, but uses a different mechanism to
@@ -49,25 +40,11 @@ class Test::Unit::TestCase
         load = nil
         before(:all) do
           load = dataset_session.load_datasets_for(self.class)
-          self.extend load.dataset_binding.record_methods
-          self.extend load.dataset_binding.instance_loaders
-          self.extend load.helper_methods
+          extend_from_dataset_load(load)
         end
-        
         before(:each) do
-          self.extend load.dataset_binding.record_methods
-          self.extend load.dataset_binding.instance_loaders
-          self.extend load.helper_methods
+          extend_from_dataset_load(load)
         end
-      end
-    end
-    
-    def dataset_session_in_hierarchy
-      self.dataset_session ||= begin
-        database_spec = ActiveRecord::Base.configurations['test'].with_indifferent_access
-        database_class = Dataset::Database.const_get(database_spec[:adapter].classify)
-        database = database_class.new(database_spec, File.expand_path(RAILS_ROOT + '/spec/tmp'))
-        Dataset::Session.new(database)
       end
     end
   end

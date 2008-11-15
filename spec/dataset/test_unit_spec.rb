@@ -98,6 +98,21 @@ describe Test::Unit::TestCase do
     load_count.should == 1
   end
   
+  it 'should copy instance variables from block to tests' do
+    value_in_test = nil
+    testcase = Class.new(Test::Unit::TestCase) do
+      dataset do
+        @myvar = 'Hello'
+      end
+      define_method :test_something do
+        value_in_test = @myvar
+      end
+    end
+    
+    run_testcase(testcase)
+    value_in_test.should == 'Hello'
+  end
+  
   it 'should load the dataset when the suite is run' do
     load_count = 0
     dataset = Class.new(Dataset::Base) do
