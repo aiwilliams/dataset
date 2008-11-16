@@ -1,5 +1,3 @@
-capture instance variable assigned in dataset block. move them to the binding. any instance variables in binding should be moved to test instances.
-
 add ability to clear the database (some tests wanted to guarantee a clear db)
 clear all dumps on new run of tests
 be sure we are capturing a dataset if it has already be captured before during a run

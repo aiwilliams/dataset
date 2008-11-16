@@ -54,15 +54,6 @@ describe Dataset::SessionBinding do
       Thing.last.created_on.should_not be_nil
       Thing.last.updated_on.should_not be_nil
     end
-    
-    it 'should provide instance loader methods for created types' do
-      id = @binding.create_record(Note, :mynote)
-      anything = Object.new
-      anything.extend @binding.instance_loaders
-      anything.notes(:mynote).should_not be_nil
-      anything.notes(:mynote).id.should == id
-      anything.note_id(:mynote).should == id
-    end
   end
   
   describe 'create_model' do
@@ -81,13 +72,35 @@ describe Dataset::SessionBinding do
       person = @binding.create_model Person, :first_name => 'Adam', :last_name => 'Williams'
       person.last_name.should == 'Williams'
     end
+  end
+  
+  describe 'model finders' do
+    before do
+      @context = Object.new
+      @context.extend @binding.instance_loaders
+      @note_one = @binding.create_model Note, :note_one
+    end
     
-    it 'should provide instance loader methods for created types' do
-      note = @binding.create_model Note, :mynote
-      anything = Object.new
-      anything.extend @binding.instance_loaders
-      anything.notes(:mynote).should == note
-      anything.note_id(:mynote).should == note.id
+    it 'should not exist for types that have not been created' do
+      lambda do
+        @context.things(:whatever)
+      end.should raise_error(NoMethodError)
+    end
+    
+    it 'should exist for types made with create_model' do
+      @context.notes(:note_one).should == @note_one
+      @context.note_id(:note_one).should == @note_one.id
+    end
+    
+    it 'should exist for types made with create_record' do
+      id = @binding.create_record Note, :note_two
+      @context.notes(:note_two).id.should == id
+      @context.note_id(:note_two).should == id
+    end
+    
+    it 'should support multiple names, returning an array' do
+      note_two = @binding.create_model Note, :note_two
+      @context.notes(:note_one, :note_two).should == [@note_one, note_two]
     end
   end
   
