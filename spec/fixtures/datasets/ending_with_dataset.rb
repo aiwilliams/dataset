@@ -1,2 +1,2 @@
-class EndingWithDataset
+class EndingWithDataset < Dataset::Base
 end

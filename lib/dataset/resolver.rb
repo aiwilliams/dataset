@@ -20,12 +20,13 @@ module Dataset
     protected
       def resolve_identifier(identifier)
         names = [identifier.to_s.camelize, identifier.to_s.camelize + suffix]
-        constant = resolve_these(names)
+        constant = resolve_these(names.reverse)
         unless constant
           raise Dataset::DatasetNotFound, "Could not find a dataset #{names.collect{|n| "'#{n}'"}.join(' or ')}."
         else
-          constant
+          raise Dataset::DatasetNotFound, "Found a class '#{constant.name}', but it does not subclass 'Dataset::Base'." unless constant.superclass == ::Dataset::Base
         end
+        constant
       end
       
       def resolve_these(names)
@@ -63,7 +64,11 @@ module Dataset
         begin
           super
         rescue Dataset::DatasetNotFound => dnf
-          raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}', but it did not define #{dnf.message.sub('Could not find ', '')}"
+          if dnf.message =~ /\ACould not find/
+            raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}', but it did not define #{dnf.message.sub('Could not find ', '')}"
+          else
+            raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}' and a class #{dnf.message.sub('Found a class ', '')}"
+          end
         end
       end
       

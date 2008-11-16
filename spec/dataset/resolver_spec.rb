@@ -2,6 +2,9 @@ require File.expand_path(File.dirname(__FILE__)) + '/../spec_helper'
 
 ResolveThis = Class.new(Dataset::Base)
 ResolveDataset = Class.new(Dataset::Base)
+SomeModelNotDs = Class.new
+SomeModelNotDsDataset = Class.new(Dataset::Base)
+NotADataset = Class.new
 
 describe Dataset::Resolver do
   before do
@@ -14,6 +17,21 @@ describe Dataset::Resolver do
   
   it 'should find ending with Dataset' do
     @resolver.resolve(:resolve).should == ResolveDataset
+  end
+  
+  it 'should keep looking if first try is not a dataset' do
+    dataset = @resolver.resolve(:some_model_not_ds)
+    dataset.should_not be(SomeModelNotDs)
+    dataset.should == SomeModelNotDsDataset
+  end
+  
+  it 'should indicate when found class is not a dataset' do
+    lambda do
+      @resolver.resolve(:not_a_dataset)
+    end.should raise_error(
+      Dataset::DatasetNotFound,
+      "Found a class 'NotADataset', but it does not subclass 'Dataset::Base'."
+    )
   end
   
   it 'should indicate that it could not find a dataset' do
@@ -60,6 +78,15 @@ describe Dataset::DirectoryResolver do
     end.should raise_error(
       Dataset::DatasetNotFound,
       "Found the dataset file '#{SPEC_ROOT + '/fixtures/datasets/constant_not_defined.rb'}', but it did not define a dataset 'ConstantNotDefined' or 'ConstantNotDefinedDataset'."
+    )
+  end
+  
+  it 'should indicate when it finds a file, but the constant defined is not a subclass of Dataset::Base' do
+    lambda do
+      @resolver.resolve(:not_a_dataset_base)
+    end.should raise_error(
+      Dataset::DatasetNotFound,
+      "Found the dataset file '#{SPEC_ROOT + '/fixtures/datasets/not_a_dataset_base.rb'}' and a class 'NotADatasetBase', but it does not subclass 'Dataset::Base'."
     )
   end
 end

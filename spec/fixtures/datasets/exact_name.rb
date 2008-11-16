@@ -1,2 +1,2 @@
-class ExactName
+class ExactName < Dataset::Base
 end
