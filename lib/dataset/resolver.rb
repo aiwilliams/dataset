@@ -14,11 +14,16 @@ module Dataset
     cattr_accessor :default
     
     def resolve(identifier)
-      identifier.is_a?(Class) ? identifier : resolve_identifier(identifier)
+      return identifier if identifier.is_a?(Class)
+      begin
+        resolve_class(identifier)
+      rescue
+        resolve_identifier(identifier)
+      end
     end
     
     protected
-      def resolve_identifier(identifier)
+      def resolve_class(identifier)
         names = [identifier.to_s.camelize, identifier.to_s.camelize + suffix]
         constant = resolve_these(names.reverse)
         unless constant
@@ -28,6 +33,7 @@ module Dataset
         end
         constant
       end
+      alias resolve_identifier resolve_class
       
       def resolve_these(names)
         names.each do |name|

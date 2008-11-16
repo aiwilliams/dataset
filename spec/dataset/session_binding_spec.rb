@@ -98,6 +98,12 @@ describe Dataset::SessionBinding do
       @context.note_id(:note_two).should == id
     end
     
+    it 'should exist for types registered with name_model' do
+      thing = Thing.create!
+      @binding.name_model(thing, :thingy)
+      @context.things(:thingy).should == thing
+    end
+    
     it 'should support multiple names, returning an array' do
       note_two = @binding.create_model Note, :note_two
       @context.notes(:note_one, :note_two).should == [@note_one, note_two]

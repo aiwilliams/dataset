@@ -49,6 +49,10 @@ describe Dataset::DirectoryResolver do
     @resolver = Dataset::DirectoryResolver.new(SPEC_ROOT + '/fixtures/datasets')
   end
   
+  it 'should not look for a file if the constant is already defined' do
+    @resolver.resolve(:resolve).should be(ResolveDataset)
+  end
+  
   it 'should find file with exact name match' do
     defined?(ExactName).should be_nil
     dataset = @resolver.resolve(:exact_name)
