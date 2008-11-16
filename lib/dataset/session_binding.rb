@@ -7,20 +7,20 @@ module Dataset
   
   class SessionBinding
     attr_reader :database, :parent_binding
-    attr_reader :instance_loaders, :record_methods
+    attr_reader :model_finders, :record_methods
     attr_reader :block_variables
     
     def initialize(database_or_parent_binding)
       @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
       @record_methods = new_record_methods_module
-      @instance_loaders = new_instance_loaders_module
+      @model_finders = new_model_finders_module
       @block_variables = Hash.new
       
       case database_or_parent_binding
       when Dataset::SessionBinding
         @parent_binding = database_or_parent_binding
         @database = parent_binding.database
-        @instance_loaders.module_eval { include database_or_parent_binding.instance_loaders }
+        @model_finders.module_eval { include database_or_parent_binding.model_finders }
         @block_variables.update(database_or_parent_binding.block_variables)
       else 
         @database = database_or_parent_binding
@@ -59,7 +59,7 @@ module Dataset
     
     def name_model(record, symbolic_name)
       record_class = record.class.base_class
-      @instance_loaders.create_loader(record_class) unless @symbolic_names_to_ids.has_key?(record_class)
+      @model_finders.create_finder(record_class) unless @symbolic_names_to_ids.has_key?(record_class)
       @symbolic_names_to_ids[record_class][symbolic_name] = record.id
       record
     end
@@ -70,7 +70,7 @@ module Dataset
         record_class = resolve_record_class record_type
         record_meta  = database.record_meta record_class
         record       = dataset_record_class.new(record_meta, attributes, symbolic_name)
-        @instance_loaders.create_loader(record.record_class) unless @symbolic_names_to_ids.has_key?(record.record_class)
+        @model_finders.create_finder(record.record_class) unless @symbolic_names_to_ids.has_key?(record.record_class)
         return_value = nil
         ActiveRecord::Base.silence do
           return_value = record.create
@@ -96,7 +96,7 @@ module Dataset
       #
       #   session_binding.create_record *args
       #
-      def new_instance_loaders_module
+      def new_model_finders_module
         mod = Module.new
         
         dataset_binding = self
@@ -107,7 +107,7 @@ module Dataset
         end
         
         class << mod
-          def create_loader(record_class)
+          def create_finder(record_class)
             record_loader_base_name = record_class.name.underscore
             define_method record_loader_base_name.pluralize do |*symbolic_names|
               names = Array(symbolic_names)

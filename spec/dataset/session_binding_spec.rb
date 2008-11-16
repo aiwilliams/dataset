@@ -29,7 +29,7 @@ describe Dataset::SessionBinding do
   
   it 'should provide itself to the instance loaders' do
     anything = Object.new
-    anything.extend @binding.instance_loaders
+    anything.extend @binding.model_finders
     anything.dataset_session_binding.should == @binding
   end
   
@@ -77,7 +77,7 @@ describe Dataset::SessionBinding do
   describe 'model finders' do
     before do
       @context = Object.new
-      @context.extend @binding.instance_loaders
+      @context.extend @binding.model_finders
       @note_one = @binding.create_model Note, :note_one
     end
     
@@ -134,7 +134,7 @@ describe Dataset::SessionBinding do
     
     it 'should have instance loader methods from parent binding' do
       anything = Object.new
-      anything.extend @nested_binding.instance_loaders
+      anything.extend @nested_binding.model_finders
       anything.things(:mything).should_not be_nil
     end
   end

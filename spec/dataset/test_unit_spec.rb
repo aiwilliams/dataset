@@ -141,7 +141,7 @@ describe Test::Unit::TestCase do
     
     testcase = Class.new(Test::Unit::TestCase) do
       self.dataset(dataset)
-      define_method :test_instance_loaders do
+      define_method :test_model_finders do
         found_model = things(:mything)
       end
     end
@@ -170,7 +170,7 @@ describe Test::Unit::TestCase do
     test_instance = nil
     testcase = Class.new(Test::Unit::TestCase) do
       self.dataset(dataset_two)
-      define_method :test_instance_loaders do
+      define_method :test_model_finders do
         test_instance = self
       end
     end

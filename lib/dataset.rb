@@ -56,7 +56,7 @@ module Dataset
         instance_variable_set(k, v)
       end
       self.extend load.dataset_binding.record_methods
-      self.extend load.dataset_binding.instance_loaders
+      self.extend load.dataset_binding.model_finders
       self.extend load.helper_methods
     end
   end
