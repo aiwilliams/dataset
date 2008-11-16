@@ -116,8 +116,12 @@ module Dataset
               end
               names.size == 1 ? models.first : models
             end
-            define_method "#{record_loader_base_name}_id" do |symbolic_name|
-              dataset_session_binding.find_id(record_class, symbolic_name)
+            define_method "#{record_loader_base_name}_id" do |*symbolic_names|
+              names = Array(symbolic_names)
+              ids = names.inject([]) do |c,n|
+                c << dataset_session_binding.find_id(record_class, n); c
+              end
+              names.size == 1 ? ids.first : ids
             end
           end
         end

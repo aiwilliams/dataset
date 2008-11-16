@@ -107,6 +107,7 @@ describe Dataset::SessionBinding do
     it 'should support multiple names, returning an array' do
       note_two = @binding.create_model Note, :note_two
       @context.notes(:note_one, :note_two).should == [@note_one, note_two]
+      @context.note_id(:note_one, :note_two).should == [@note_one.id, note_two.id]
     end
   end
   
