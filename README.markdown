@@ -89,6 +89,7 @@ In your test_helper.rb/spec_helper.rb:
     require 'dataset'
     class Test::Unit::TestCase
       include Dataset
+      datasets_directory "#{RAILS_ROOT}/spec/datasets"
     end
 
 If you don't use rspec_on_rails, or you have specs that aren't of the RailsExampleGroup type, you should do this in spec_helper.rb:
@@ -96,9 +97,10 @@ If you don't use rspec_on_rails, or you have specs that aren't of the RailsExamp
     require 'dataset'
     class Spec::Example::ExampleGroup
       include Dataset
+      datasets_directory "#{RAILS_ROOT}/spec/datasets"
     end
 
-If you were a user of my Scenarios plugin, and want to do as little as possible to get going (assumes you are using rspec_on_rails):
+If you were a user of the Scenarios plugin, and want to do as little as possible to get going (assumes you are using rspec_on_rails):
 
     require 'dataset'
     Scenario = Scenarios = Dataset
@@ -113,7 +115,7 @@ If you were a user of my Scenarios plugin, and want to do as little as possible 
         @suffix ||= 'Scenario'
       end
     end
-    Dataset::Resolver.default = ScenariosResolver.new(dir + '/scenarios')
+    Dataset::Resolver.default = ScenariosResolver.new("#{RAILS_ROOT}/spec/scenarios")
 
 
 Credits

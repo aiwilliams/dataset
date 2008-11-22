@@ -32,6 +32,17 @@ module Dataset
       end
     end
     
+    mattr_accessor :datasets_database_dump_path
+    self.datasets_database_dump_path = File.expand_path(RAILS_ROOT + '/tmp/dataset') if defined?(RAILS_ROOT)
+    
+    # Replaces the default Dataset::Resolver with one that will look for
+    # dataset class definitions in the specified directory. Snapshots of the
+    # database will be stored in a subdirectory 'tmp'.
+    def datasets_directory(path)
+      Dataset::Resolver.default = Dataset::DirectoryResolver.new(path)
+      Dataset::ClassMethods.datasets_database_dump_path = File.join(path, '/tmp/dataset')
+    end
+    
     def add_dataset(*datasets, &block)
       dataset_session = dataset_session_in_hierarchy
       datasets.each { |dataset| dataset_session.add_dataset(self, dataset) }
@@ -44,7 +55,7 @@ module Dataset
       self.dataset_session ||= begin
         database_spec = ActiveRecord::Base.configurations['test'].with_indifferent_access
         database_class = Dataset::Database.const_get(database_spec[:adapter].classify)
-        database = database_class.new(database_spec, File.expand_path(RAILS_ROOT + '/spec/tmp'))
+        database = database_class.new(database_spec, Dataset::ClassMethods.datasets_database_dump_path)
         Dataset::Session.new(database)
       end
     end
