@@ -1,7 +1,9 @@
 require 'fileutils'
 
 module Dataset
-  module Database
+  module Database # :nodoc:
+    
+    # Provides Dataset a way to clear, dump and load databases.
     class Base
       include FileUtils
       

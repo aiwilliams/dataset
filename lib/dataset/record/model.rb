@@ -1,5 +1,5 @@
 module Dataset
-  module Record
+  module Record # :nodoc:
     
     class Model # :nodoc:
       attr_reader :attributes, :model, :meta, :symbolic_name

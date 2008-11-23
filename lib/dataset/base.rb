@@ -1,4 +1,11 @@
 module Dataset
+  
+  # The superclass of your Dataset classes.
+  #
+  # It is recommended that you create a dataset using the Dataset::Block
+  # method first, then grow into using classes as you recognize patterns in
+  # your test data creation. This will help you to keep simple things simple.
+  #
   class Base
     class << self
       # Allows a subclass to define helper methods that should be made
@@ -57,11 +64,89 @@ module Dataset
       end
     end
     
+    # Invoked once before a collection of tests is run. If you use a dataset
+    # in multiple test classes, it will be called once for each of them -
+    # remember that the database will be cleared at the beginning of running a
+    # 'suite' or 'group' of tests, unless you are using nested contexts (as in
+    # nested describe blocks in RSpec).
+    #
+    # Override this method in your subclasses.
+    #
     def load; end
   end
   
+  # The easiest way to create some data before a suite of tests is run is by
+  # using a Dataset::Block. An example works wonders:
+  #
+  #    class PeopleTest < Test::Unit::TestCase
+  #      dataset do
+  #        create_record :person, :billy, :name => 'Billy'
+  #      end
+  #            
+  #      def test_name
+  #        assert_equal 'Billy', people(:billy).name
+  #      end
+  #    end
+  #
+  # The database will be cleared and billy will be inserted once before
+  # running each of the tests within a transaction. All the normal transaction
+  # fixtures stuff will still work.
+  #
+  # One of the great features of Dataset, at least when things get really
+  # interesting in your data needs, is that nested contexts will be additive.
+  # Consider this:
+  #
+  #    describe Something do
+  #      dataset :a              => Dataset :a is loaded (at the right time)
+  #         
+  #      it 'should whatever'
+  #      end
+  #         
+  #      describe More do
+  #        dataset :b            => Dataset :b is loaded. :a data is still there
+  #           
+  #        it 'should'
+  #        end
+  #      end
+  #         
+  #      describe Another do     => Database is restored to :a, without re-running :a logic
+  #        it 'should'
+  #        end
+  #      end
+  #    end
+  #
+  # == Instance Variables
+  #
+  # You may also assign instance variables in a dataset block, and they will
+  # be available to your test methods. You have to be careful with this in a
+  # similar way that you must with an RSpec before :all block. Since the
+  # instance variables are pointing to the same instances accross all tests,
+  # things can get weird if you intend to change their state. It's best use if
+  # for loading objects that you want to read a lot without loading over and
+  # over again for each test.
+  #
+  # == Building on Other Datasets
+  #
+  # You may pass any number of Dataset::Base subclasses - or better yet, their
+  # names - to the dataset method. When you use a block, this adds a lot of
+  # clarity:
+  #
+  #    class PersonTest < Test::Unit::TestCase
+  #      dataset :organization, :people do
+  #        id = create_record :person, :second_admin, :name => 'Admin Three'
+  #        create_record :organization_administratorship, :organization_id => organization_id(:first_bank), :person_id => id
+  #      end
+  #       
+  #      def test_admins
+  #        assert organizations(:first_bank).admins.include?(people(:second_admin))
+  #      end
+  #    end
+  #
+  # == Reusing a Dataset
+  #
+  # When you need to go beyond the block, create a Dataset::Base subclass!
   class Block < Base
-    def load
+    def load # :nodoc:
       doload
       instance_variables.each do |name|
         dataset_session_binding.block_variables[name] = instance_variable_get(name)

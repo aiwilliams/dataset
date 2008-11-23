@@ -1,7 +1,7 @@
 require 'set'
 
 module Dataset
-  class Collection < Array
+  class Collection < Array # :nodoc:
     def initialize(parent)
       concat parent
     end

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Dataset::ModelFinders</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Dataset::ModelFinders</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/dataset/session_binding_rb.html">
+                lib/dataset/session_binding.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Whenever you use <a href="RecordMethods.html">Dataset::RecordMethods</a>,
+you will get finder methods in your tests that help you load instances of
+the records you have created (or named models).
+</p>
+<pre>
+   create_record :person, :jimmy, :name =&gt; 'Jimmy'
+   person_id(:jimmy)  =&gt; The id was captured from create_record
+   people(:jimmy)     =&gt; The same as Jimmy.find(person_id(:jimmy))
+</pre>
+<p>
+The methods will not exist in a test unless it utilizes a dataset (or
+defines one itself through the block technique) that creates a record for
+the type.
+</p>
+<p>
+You may also pass multiple names to these methods, which will have them
+return an array of values.
+</p>
+<pre>
+   people(:jimmy, :jane, :jeff)     =&gt; [&lt;# Person :name =&gt; 'Jimmy'&gt;, &lt;# Person :name =&gt; 'Jane'&gt;, &lt;# Person :name =&gt; 'Jeff'&gt;]
+   person_id(:jimmy, :jane, :jeff)  =&gt; [1, 2, 3]
+</pre>
+<p>
+NOTE the plurality of the instance finder, versus the singularity of the id
+finder.
+</p>
+<h2>Single Table Inheritence</h2>
+<p>
+This is a TODO for <a href="../Dataset.html">Dataset</a>. For now, you will
+have to use the finder of the base class:
+</p>
+<pre>
+   class Person &lt; ActiveRecord::Base; end
+   class User &lt; Person; end
+
+   create_record :user, :bobby, :name =&gt; 'Bobby'
+
+   people(:bobby)
+</pre>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

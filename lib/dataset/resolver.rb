@@ -7,12 +7,12 @@ module Dataset
   # A dataset may be referenced as a class or as a name. A Dataset::Resolver
   # will take an identifier, whether a class or a name, and return the class.
   #
-  # The base implementation will simply attempt to convert a name to a
-  # constant.
-  #
   class Resolver
     cattr_accessor :default
     
+    # Attempt to convert a name to a constant. With the identifier :people, it
+    # will search for 'PeopleDataset', then 'People'.
+    #
     def resolve(identifier)
       return identifier if identifier.is_a?(Class)
       begin
@@ -23,7 +23,7 @@ module Dataset
     end
     
     protected
-      def resolve_class(identifier)
+      def resolve_class(identifier) # :nodoc:
         names = [identifier.to_s.camelize, identifier.to_s.camelize + suffix]
         constant = resolve_these(names.reverse)
         unless constant
@@ -35,7 +35,7 @@ module Dataset
       end
       alias resolve_identifier resolve_class
       
-      def resolve_these(names)
+      def resolve_these(names) # :nodoc:
         names.each do |name|
           constant = name.constantize rescue nil
           return constant if constant
@@ -43,7 +43,7 @@ module Dataset
         nil
       end
       
-      def suffix
+      def suffix # :nodoc:
         @suffix ||= 'Dataset'
       end
   end
@@ -58,7 +58,7 @@ module Dataset
     end
     
     protected
-      def resolve_identifier(identifier)
+      def resolve_identifier(identifier) # :nodoc:
         file = File.join(@path, identifier.to_s)
         unless File.exists?(file + '.rb')
           file = file + '_' + file_suffix
@@ -78,7 +78,7 @@ module Dataset
         end
       end
       
-      def file_suffix
+      def file_suffix # :nodoc:
         @file_suffix ||= suffix.downcase
       end
   end

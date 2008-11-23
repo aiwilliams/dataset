@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>datasets_directory (Dataset::ClassMethods)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre>     <span class="ruby-comment cmt"># File lib/dataset.rb, line 98</span>
+ 98:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">datasets_directory</span>(<span class="ruby-identifier">path</span>)
+ 99:       <span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Resolver</span>.<span class="ruby-identifier">default</span> = <span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">DirectoryResolver</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">path</span>)
+100:       <span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>.<span class="ruby-identifier">datasets_database_dump_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">path</span>, <span class="ruby-value str">'/tmp/dataset'</span>)
+101:     <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

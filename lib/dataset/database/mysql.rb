@@ -1,5 +1,9 @@
 module Dataset
-  module Database
+  module Database # :nodoc:
+    
+    # The interface to a mySQL database, this will capture by creating a dump
+    # file and restore by loading one of the same.
+    #
     class Mysql < Base
       def initialize(database_spec, storage_path)
         @database = database_spec[:database]

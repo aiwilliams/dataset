@@ -1,29 +1,7 @@
-Dataset
-=========
+= Dataset
 
-*Data for Your Tests.*
+Dataset provides a simple API for creating and finding sets of data in your database. Check out Dataset::RecordMethods and Dataset::ModelFinders.
 
-Quick Start
------------
-
-Dataset provides a simple API for creating sets of data in your database. Here it is:
-
-* create_record(:my_type, :somename, :attr => 'value')
-  A classic fixture insert. Returns the id. :somename is optional.
-  
-* create_model(:my_type, :somename, :attr => 'value')
-  Instantiates your record class, saves it. Returns the record. :somename is optional.
-  
-* name_model(model, :somename)
-  Gives your already created model a name.
-  
-* find_id(:my_type, :somename)
-  Answer the id of MyType having :somename. The database is not used.
-  
-* find_model(:my_type, :somename)
-  Answer an instance of MyType having :somename. The database is used.
-  
-  
 Dataset loads data intelligently if you use 'nested contexts' in your tests (RSpec, anything that uses Test::Unit::TestCase subclassing for creating nested contexts):
 
     describe Something do
@@ -75,10 +53,10 @@ The benefit is that you can reuse interesting sets of data, without sacrificing 
     end
   
 
-There is more sugar to it (like helpers, dataset blocks), but that's a good quick start.
+Get things installed, then read more in the Dataset documentation.
 
-Installation
-------------
+
+== Installation
 
 Install the plugin:
 
@@ -118,8 +96,7 @@ If you were a user of the Scenarios plugin, and want to do as little as possible
     Dataset::Resolver.default = ScenariosResolver.new("#{RAILS_ROOT}/spec/scenarios")
 
 
-Credits
--------
+== Credits
 
 Written by [Adam Williams](http://github.com/aiwilliams).
     

@@ -1,5 +1,5 @@
 module Dataset
-  module Record
+  module Record # :nodoc:
     
     # A mechanism to cache information about an ActiveRecord class to speed
     # things up a bit for insertions, finds, and method generation.

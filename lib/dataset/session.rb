@@ -1,5 +1,5 @@
 module Dataset
-  class Session
+  class Session # :nodoc:
     attr_accessor :dataset_resolver
     
     def initialize(database, dataset_resolver = Resolver.default)

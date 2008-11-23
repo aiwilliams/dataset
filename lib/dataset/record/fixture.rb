@@ -1,7 +1,7 @@
 require 'active_record/fixtures'
 
 module Dataset
-  module Record
+  module Record # :nodoc:
     
     class Fixture # :nodoc:
       attr_reader :meta, :symbolic_name

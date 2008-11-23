@@ -11,4 +11,13 @@ Spec::Rake::SpecTask.new do |t|
   t.spec_opts = ['--options', 'spec/spec.opts']
 end
 
+desc "Generate rdoc"
+Rake::RDocTask.new(:doc) do |r|
+  r.title = "Dataset"
+  r.main = "README"
+  r.options << "--line-numbers"
+  r.rdoc_files.include("README", "LICENSE", "lib/**/*.rb")
+  r.rdoc_dir = "doc"
+end
+
 task :default => :spec
