@@ -1,9 +1,9 @@
 namespace :db do
   namespace :dataset do
-    desc "Load one or more datasets into the current environment's database using datasets=name,name"
+    desc "Load one or more datasets into the current environment's database using DATASETS=name,name"
     task :load => :environment do
       require 'dataset'
-      dataset_names = ENV['datasets'] || 'default'
+      dataset_names = (ENV['DATASETS'] || 'default').split(',')
       
       context = Class.new do
         extend Dataset::ClassMethods
