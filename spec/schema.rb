@@ -1,4 +1,4 @@
-ActiveRecord::Schema.define do
+ActiveRecord::Schema.define(:version => 20081126181722) do
   create_table :people, :force => true do |t|
     t.column :first_name, :string
     t.column :last_name, :string

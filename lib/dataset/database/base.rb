@@ -12,7 +12,7 @@ module Dataset
         ActiveRecord::Base.silence do
           connection.tables.each do |table_name|
             connection.delete "DELETE FROM #{connection.quote_table_name(table_name)}",
-              "Dataset::Database#clear"
+              "Dataset::Database#clear" unless table_name == 'schema_migrations'
           end
         end
       end
