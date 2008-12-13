@@ -51,7 +51,7 @@ module Dataset
       def resolve_these(names) # :nodoc:
         names.each do |name|
           constant = name.constantize rescue nil
-          return constant if constant
+          return constant if constant && constant.is_a?(Class)
         end
         nil
       end

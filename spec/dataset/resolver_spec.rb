@@ -5,10 +5,16 @@ ResolveDataset = Class.new(Dataset::Base)
 SomeModelNotDs = Class.new
 SomeModelNotDsDataset = Class.new(Dataset::Base)
 NotADataset = Class.new
+TheModule = Module.new
+TheModuleDataset = Class.new(Dataset::Base)
 
 describe Dataset::Resolver do
   before do
     @resolver = Dataset::Resolver.new
+  end
+  
+  it 'should skip modules' do
+    @resolver.resolve(:the_module).should == TheModuleDataset
   end
   
   it 'should find simply classified' do
