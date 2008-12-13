@@ -72,7 +72,7 @@ describe Dataset::DirectoryResolver do
       @resolver.resolve(:undefined)
     end.should raise_error(
       Dataset::DatasetNotFound,
-      "Could not find a dataset file in '#{SPEC_ROOT + '/fixtures/datasets'}' having the name 'undefined.rb' or 'undefined_dataset.rb'."
+      %(Could not find a dataset file in ["#{SPEC_ROOT + '/fixtures/datasets'}"] having the name 'undefined.rb' or 'undefined_dataset.rb'.)
     )
   end
   
@@ -92,5 +92,13 @@ describe Dataset::DirectoryResolver do
       Dataset::DatasetNotFound,
       "Found the dataset file '#{SPEC_ROOT + '/fixtures/datasets/not_a_dataset_base.rb'}' and a class 'NotADatasetBase', but it does not subclass 'Dataset::Base'."
     )
+  end
+  
+  it 'should support adding multiple directories' do
+    @resolver << (SPEC_ROOT + '/fixtures/more_datasets')
+    defined?(InAnotherDirectoryDataset).should be_nil
+    dataset = @resolver.resolve(:in_another_directory)
+    defined?(InAnotherDirectoryDataset).should == 'constant'
+    dataset.should == InAnotherDirectoryDataset
   end
 end

@@ -10,30 +10,43 @@ module Dataset
   class Resolver
     cattr_accessor :default
     
+    def identifiers
+      @identifiers ||= {}
+    end
+    
     # Attempt to convert a name to a constant. With the identifier :people, it
     # will search for 'PeopleDataset', then 'People'.
     #
     def resolve(identifier)
       return identifier if identifier.is_a?(Class)
-      begin
-        resolve_class(identifier)
-      rescue
-        resolve_identifier(identifier)
+      if constant = identifiers[identifier]
+        return constant
       end
+
+      constant = resolve_class(identifier)
+      unless constant
+        constant = resolve_identifier(identifier)
+      end
+      identifiers[identifier] = constant
     end
     
     protected
-      def resolve_class(identifier) # :nodoc:
-        names = [identifier.to_s.camelize, identifier.to_s.camelize + suffix]
-        constant = resolve_these(names.reverse)
+      def resolve_identifier(identifier) # :nodoc:
+        constant = resolve_class(identifier)
         unless constant
-          raise Dataset::DatasetNotFound, "Could not find a dataset #{names.collect{|n| "'#{n}'"}.join(' or ')}."
-        else
-          raise Dataset::DatasetNotFound, "Found a class '#{constant.name}', but it does not subclass 'Dataset::Base'." unless constant.superclass == ::Dataset::Base
+          raise Dataset::DatasetNotFound, "Could not find a dataset '#{identifier.to_s.camelize}' or '#{identifier.to_s.camelize + suffix}'."
         end
         constant
       end
-      alias resolve_identifier resolve_class
+      
+      def resolve_class(identifier)
+        names = [identifier.to_s.camelize, identifier.to_s.camelize + suffix]
+        constant = resolve_these(names.reverse)
+        if constant && constant.superclass != ::Dataset::Base
+          raise Dataset::DatasetNotFound, "Found a class '#{constant.name}', but it does not subclass 'Dataset::Base'."
+        end
+        constant
+      end
       
       def resolve_these(names) # :nodoc:
         names.each do |name|
@@ -53,29 +66,34 @@ module Dataset
   # be a class already, it is simply returned.
   #
   class DirectoryResolver < Resolver
-    def initialize(path)
-      @path = path
+    def initialize(*paths)
+      @paths = paths
+    end
+    
+    def <<(path)
+      @paths << path
     end
     
     protected
       def resolve_identifier(identifier) # :nodoc:
-        file = File.join(@path, identifier.to_s)
-        unless File.exists?(file + '.rb')
-          file = file + '_' + file_suffix
+        @paths.each do |path|
+          file = File.join(path, identifier.to_s)
           unless File.exists?(file + '.rb')
-            raise DatasetNotFound, "Could not find a dataset file in '#{@path}' having the name '#{identifier}.rb' or '#{identifier}_#{file_suffix}.rb'."
+            file = file + '_' + file_suffix
+            next unless File.exists?(file + '.rb')
+          end
+          require file
+          begin
+            return super
+          rescue Dataset::DatasetNotFound => dnf
+            if dnf.message =~ /\ACould not find/
+              raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}', but it did not define #{dnf.message.sub('Could not find ', '')}"
+            else
+              raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}' and a class #{dnf.message.sub('Found a class ', '')}"
+            end
           end
         end
-        require file
-        begin
-          super
-        rescue Dataset::DatasetNotFound => dnf
-          if dnf.message =~ /\ACould not find/
-            raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}', but it did not define #{dnf.message.sub('Could not find ', '')}"
-          else
-            raise Dataset::DatasetNotFound, "Found the dataset file '#{file + '.rb'}' and a class #{dnf.message.sub('Found a class ', '')}"
-          end
-        end
+        raise DatasetNotFound, "Could not find a dataset file in #{@paths.inspect} having the name '#{identifier}.rb' or '#{identifier}_#{file_suffix}.rb'."
       end
       
       def file_suffix # :nodoc:
