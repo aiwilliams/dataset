@@ -1,23 +1,20 @@
-$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + '/vendor/plugins/rspec/lib'))
+# -*- ruby -*-
 
-require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
+$:.unshift(File.join(File.dirname(__FILE__), 'lib'))
+
+require 'rubygems'
+require 'hoe'
+require 'dataset/version'
 require 'spec/rake/spectask'
+
+Hoe.new('dataset', Dataset::VERSION::STRING) do |p|
+  p.developer('Adam Williams', 'adam@thewilliams.ws')
+end
+
+task :default => :spec
 
 desc "Run all specs"
 Spec::Rake::SpecTask.new do |t|
   t.spec_files = FileList['spec/**/*_spec.rb']
   t.spec_opts = ['--options', 'spec/spec.opts']
 end
-
-desc "Generate rdoc"
-Rake::RDocTask.new(:doc) do |r|
-  r.title = "Dataset"
-  r.main = "README"
-  r.options << "--line-numbers"
-  r.rdoc_files.include("README", "LICENSE", "lib/**/*.rb")
-  r.rdoc_dir = "doc"
-end
-
-task :default => :spec

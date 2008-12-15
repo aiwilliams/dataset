@@ -4,3 +4,4 @@ environments
 vendor
 tmp
 .tm_last_run_ruby
+pkg

@@ -1,3 +1,4 @@
+require 'dataset/version'
 require 'dataset/base'
 require 'dataset/database/base'
 require 'dataset/database/mysql'
