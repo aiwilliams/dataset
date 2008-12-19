@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: README.txt</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>README.txt</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>README.txt
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Thu Dec 18 20:22:26 -0500 2008</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1><a href="../classes/Dataset.html">Dataset</a></h1>
+<p>
+<a href="../classes/Dataset.html">Dataset</a> provides a simple API for
+creating and finding sets of data in your database. Check out <a
+href="../classes/Dataset/RecordMethods.html">Dataset::RecordMethods</a> and
+<a href="../classes/Dataset/ModelFinders.html">Dataset::ModelFinders</a>.
+</p>
+<p>
+<a href="../classes/Dataset.html">Dataset</a> loads data intelligently if
+you use &#8216;nested contexts&#8217; in your tests (RSpec, anything that
+uses Test::Unit::TestCase subclassing for creating nested contexts):
+</p>
+<pre>
+    describe Something do
+      dataset :a              =&gt; Dataset :a is loaded (at the right time)
+
+      it 'should whatever'
+      end
+
+      describe More do
+        dataset :b            =&gt; Dataset :b is loaded. :a data is still there
+
+        it 'should'
+        end
+      end
+
+      describe Another do     =&gt; Database is restored to :a, without re-running :a logic
+        it 'should'
+        end
+      end
+    end
+</pre>
+<p>
+The goal is to see a marked improvement in overall test run speed, basing
+this on the assumption that it is faster to have the OS copy a file or
+mySQL dump and load. Of course, we may find this to be a false assumption,
+but there were plenty of bugs in the former &#8216;Scenarios&#8217; -
+addressing that afforded the opportunity to test the assumption.
+</p>
+<p>
+<a href="../classes/Dataset.html">Dataset</a> does not prevent you from
+using other libraries like Machinist or factory_girl. If you were to used
+either of those, you could have a dataset like this:
+</p>
+<pre>
+    require 'faker'
+
+    class OrganizationsDataset &lt; Dataset::Base
+      Sham.name  { Faker::Name.name }
+
+      Organization.blueprint do
+        name { Sham.name }
+      end
+
+      def load
+        name_model Organization.make, :org_one
+      end
+    end
+</pre>
+<p>
+The benefit is that you can reuse interesting sets of data, without
+sacrificing the utility of those other libraries.
+</p>
+<pre>
+    describe Organization, 'stuff' do
+      dataset :organizations
+    end
+
+    describe Organization, 'other stuff' do
+      dataset :organizations
+    end
+</pre>
+<p>
+Get things installed, then read more in the <a
+href="../classes/Dataset.html">Dataset</a> documentation.
+</p>
+<h2>Installation</h2>
+<p>
+Install the plugin:
+</p>
+<pre>
+    ./script/plugin install git://github.com/aiwilliams/dataset.git
+</pre>
+<p>
+In your test_helper.rb/spec_helper.rb:
+</p>
+<pre>
+    require 'dataset'
+    class Test::Unit::TestCase
+      include Dataset
+      datasets_directory &quot;#{RAILS_ROOT}/spec/datasets&quot;
+    end
+</pre>
+<p>
+If you don&#8216;t use rspec_on_rails, or you have specs that aren&#8216;t
+of the RailsExampleGroup type, you should do this in spec_helper.rb:
+</p>
+<pre>
+    require 'dataset'
+    class Spec::Example::ExampleGroup
+      include Dataset
+      datasets_directory &quot;#{RAILS_ROOT}/spec/datasets&quot;
+    end
+</pre>
+<p>
+If you were a user of the Scenarios plugin, and want to do as little as
+possible to get going (assumes you are using rspec_on_rails):
+</p>
+<pre>
+    require 'dataset'
+    Scenario = Scenarios = Dataset
+    class Test::Unit::TestCase
+      include Dataset
+      class &lt;&lt; self
+        alias_method :scenario, :dataset
+      end
+    end
+    class ScenariosResolver &lt; Dataset::DirectoryResolver
+      def suffix
+        @suffix ||= 'Scenario'
+      end
+    end
+    Dataset::Resolver.default = ScenariosResolver.new(&quot;#{RAILS_ROOT}/spec/scenarios&quot;)
+</pre>
+<h2>Credits</h2>
+<p>
+Written by [Adam Williams](<a
+href="http://github.com/aiwilliams">github.com/aiwilliams</a>).
+</p>
+<p>
+Contributors:
+</p>
+<ul>
+<li>[Saturn Flyer](<a
+href="http://www.saturnflyer.com">www.saturnflyer.com</a>) [github](<a
+href="http://github.com/saturnflyer">github.com/saturnflyer</a>)
+
+</li>
+<li>[Steve Iannopollo](<a
+href="http://github.com/siannopollo">github.com/siannopollo</a>)
+
+</li>
+<li>[John Long](<a href="http://github.com/jlong">github.com/jlong</a>)
+
+</li>
+</ul>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>clear (Dataset::Database::Base)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/dataset/database/base.rb, line 10</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">clear</span>
+        <span class="ruby-identifier">connection</span> = <span class="ruby-constant">ActiveRecord</span><span class="ruby-operator">::</span><span class="ruby-constant">Base</span>.<span class="ruby-identifier">connection</span>
+        <span class="ruby-constant">ActiveRecord</span><span class="ruby-operator">::</span><span class="ruby-constant">Base</span>.<span class="ruby-identifier">silence</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">tables</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">table_name</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">delete</span> <span class="ruby-node">&quot;DELETE FROM #{connection.quote_table_name(table_name)}&quot;</span>,
+              <span class="ruby-value str">&quot;Dataset::Database#clear&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">table_name</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'schema_migrations'</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
