@@ -121,7 +121,7 @@ module Dataset
   # be available to your test methods. You have to be careful with this in a
   # similar way that you must with an RSpec before :all block. Since the
   # instance variables are pointing to the same instances accross all tests,
-  # things can get weird if you intend to change their state. It's best use if
+  # things can get weird if you intend to change their state. It's best use is
   # for loading objects that you want to read a lot without loading over and
   # over again for each test.
   #
@@ -146,11 +146,12 @@ module Dataset
   #
   # When you need to go beyond the block, create a Dataset::Base subclass!
   class Block < Base
+    include Dataset::InstanceMethods
+    
     def load # :nodoc:
+      dataset_session_binding.install_block_variables(self)
       doload
-      instance_variables.each do |name|
-        dataset_session_binding.block_variables[name] = instance_variable_get(name)
-      end
+      dataset_session_binding.copy_block_variables(self)
     end
   end
 end

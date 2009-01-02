@@ -1,4 +1,5 @@
 require 'dataset/version'
+require 'dataset/instance_methods'
 require 'dataset/base'
 require 'dataset/database/base'
 require 'dataset/database/mysql'
@@ -76,13 +77,13 @@ module Dataset
       raise "I don't understand your test framework"
     end
     
-    test_context.extend ClassMethods
+    test_context.extend ContextClassMethods
   end
   
   # Methods that are added to the class that Dataset is included in (the test
   # context class).
   #
-  module ClassMethods
+  module ContextClassMethods
     def self.extended(context_class) # :nodoc:
       context_class.module_eval do
         include InstanceMethods
@@ -99,7 +100,7 @@ module Dataset
     # Dataset::Database::Base).
     def datasets_directory(path)
       Dataset::Resolver.default = Dataset::DirectoryResolver.new(path)
-      Dataset::ClassMethods.datasets_database_dump_path = File.join(path, '/tmp/dataset')
+      Dataset::ContextClassMethods.datasets_database_dump_path = File.join(path, '/tmp/dataset')
     end
     
     def add_dataset(*datasets, &block) # :nodoc:
@@ -114,20 +115,9 @@ module Dataset
       self.dataset_session ||= begin
         database_spec = ActiveRecord::Base.configurations['test'].with_indifferent_access
         database_class = Dataset::Database.const_get(database_spec[:adapter].classify)
-        database = database_class.new(database_spec, Dataset::ClassMethods.datasets_database_dump_path)
+        database = database_class.new(database_spec, Dataset::ContextClassMethods.datasets_database_dump_path)
         Dataset::Session.new(database)
       end
-    end
-  end
-  
-  module InstanceMethods # :nodoc:
-    def extend_from_dataset_load(load)
-      load.dataset_binding.block_variables.each do |k,v|
-        instance_variable_set(k, v)
-      end
-      self.extend load.dataset_binding.record_methods
-      self.extend load.dataset_binding.model_finders
-      self.extend load.helper_methods
     end
   end
 end

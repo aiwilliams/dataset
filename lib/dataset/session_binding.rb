@@ -170,6 +170,12 @@ module Dataset
       end
     end
     
+    def copy_block_variables(dataset_block)
+      dataset_block.instance_variables.each do |name|
+        self.block_variables[name] = dataset_block.instance_variable_get(name)
+      end
+    end
+    
     def create_model(record_type, *args)
       insert(Dataset::Record::Model, record_type, *args)
     end
@@ -197,6 +203,12 @@ module Dataset
         parent_binding.find_model record_type, symbolic_name
       else
         raise RecordNotFound.new(record_type, symbolic_name)
+      end
+    end
+    
+    def install_block_variables(target)
+      block_variables.each do |k,v|
+        target.instance_variable_set(k,v)
       end
     end
     

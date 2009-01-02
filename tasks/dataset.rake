@@ -6,7 +6,7 @@ namespace :db do
       dataset_names = (ENV['DATASETS'] || 'default').split(',')
       
       context = Class.new do
-        extend Dataset::ClassMethods
+        extend Dataset::ContextClassMethods
         datasets_directory [
           "#{RAILS_ROOT}/spec/datasets",
           "#{RAILS_ROOT}/test/datasets"

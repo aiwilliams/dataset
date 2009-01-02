@@ -113,6 +113,23 @@ describe Test::Unit::TestCase do
     value_in_test.should == 'Hello'
   end
   
+  it 'should copy instance variables from block to subclass blocks' do
+    value_in_subclass_block = nil
+    testcase = Class.new(Test::Unit::TestCase) do
+      dataset do
+        @myvar = 'Hello'
+      end
+    end
+    subclass = Class.new(testcase) do
+      dataset do
+        value_in_subclass_block = @myvar
+      end
+    end
+    
+    run_testcase(subclass)
+    value_in_subclass_block.should == 'Hello'
+  end
+  
   it 'should load the dataset when the suite is run' do
     load_count = 0
     dataset = Class.new(Dataset::Base) do

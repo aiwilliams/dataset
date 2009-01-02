@@ -4,3 +4,6 @@
 
   * Birthday!
 
+=== 
+
+* Sub-contexts get instance variables from ancestors

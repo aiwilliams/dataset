@@ -41,7 +41,7 @@ module Dataset
     
     def initialize(load)
       @load = load
-      @dataset_binding = SessionBinding.new(load.dataset_binding)
+      @dataset_binding = SessionBinding.new(@load.dataset_binding)
     end
   end
 end
