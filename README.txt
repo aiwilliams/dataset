@@ -53,7 +53,7 @@ The benefit is that you can reuse interesting sets of data, without sacrificing 
     end
   
 
-Get things installed, then read more in the Dataset documentation (http://aiwilliams.github.com/dataset)
+Get things installed, then read more in the Dataset documentation at http://aiwilliams.github.com/dataset
 
 
 == Installation
