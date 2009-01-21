@@ -119,6 +119,18 @@ describe Dataset::SessionBinding do
     end
   end
   
+  describe 'name_to_sym' do
+    it 'should convert strings to symbols' do
+      @binding.name_to_sym(nil).should == nil
+      @binding.name_to_sym('thing').should == :thing
+      @binding.name_to_sym('Mything').should == :mything
+      @binding.name_to_sym('MyThing').should == :my_thing
+      @binding.name_to_sym('My Thing').should == :my_thing
+      @binding.name_to_sym('"My Thing"').should == :my_thing
+      @binding.name_to_sym('\'My Thing\'').should == :my_thing
+    end
+  end
+  
   describe 'nested bindings' do
     before do
       @binding.create_model Thing, :mything, :name => 'my thing'

@@ -146,6 +146,15 @@ module Dataset
     def name_model(*args)
       dataset_session_binding.name_model(*args)
     end
+    
+    # Converts string names into symbols for use in naming models
+    # 
+    #     name_to_sym 'my name' => :my_name
+    #     name_to_sym 'BObama'  => :b_obama
+    # 
+    def name_to_sym(name)
+      dataset_session_binding.name_to_sym(name)
+    end
   end
   
   class SessionBinding # :nodoc:
@@ -217,6 +226,11 @@ module Dataset
       @model_finders.create_finder(record_class) unless @symbolic_names_to_ids.has_key?(record_class)
       @symbolic_names_to_ids[record_class][symbolic_name] = record.id
       record
+    end
+    
+    def name_to_sym(name)
+      return nil if name.nil?
+      name.to_s.underscore.gsub("'", "").gsub("\"", "").gsub(" ", "_").to_sym
     end
     
     protected
