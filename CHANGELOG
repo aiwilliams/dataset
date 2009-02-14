@@ -10,7 +10,7 @@
   states(:state) == places(:state) == north_carolinas(:state) # read with the class names pluralized
 
 * Moved to jeweler for much cleaner, github embracing gem building [aiwilliams]
-* Support for simple belongs to associations
+* Support for simple belongs to associations [aiwilliams]
 
   class Person < ActiveRecord::Base; end
   class Note < ActiveRecord::Base
@@ -31,7 +31,18 @@
   # We'll get rid of the underscore in 'm_list_messages'
   create_record MList::Message, :test
   mlist_messages(:test)
-  
+
+* Helper method for converting strings to useful symbols for finding records [siannopollo]
+
+  This is useful if you write creator methods of your own.
+
+  def create_person(attributes)
+    create_record Person, name_to_sym(attributes[:name]), attributes
+  end
+
+  create_person(:name => 'Little John')
+  people(:little_john)
+
   
 *1.0.0 [Scenarios Replacement] (December 15, 2008)
 
