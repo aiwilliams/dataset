@@ -4,12 +4,14 @@ module Dataset
   module Record # :nodoc:
     
     class Fixture # :nodoc:
-      attr_reader :meta, :symbolic_name
+      attr_reader :meta, :symbolic_name, :session_binding
       
-      def initialize(meta, attributes, symbolic_name = nil)
-        @meta          = meta
-        @attributes    = attributes.stringify_keys
-        @symbolic_name = symbolic_name || object_id
+      def initialize(meta, attributes, symbolic_name, session_binding)
+        @meta            = meta
+        @attributes      = attributes.stringify_keys
+        @symbolic_name   = symbolic_name || object_id
+        @session_binding = session_binding
+        
         install_default_attributes!
       end
       
@@ -26,14 +28,18 @@ module Dataset
         meta.record_class
       end
       
+      def to_fixture
+        ::Fixture.new(to_hash, meta.class_name)
+      end
+      
       def to_hash
         hash = @attributes.dup
         hash[meta.inheritance_column] = meta.sti_name if meta.inheriting_record?
+        record_class.reflections.each do |name, reflection|
+          name = name.to_s
+          add_reflection_attributes(hash, name, reflection) if hash[name]
+        end
         hash
-      end
-      
-      def to_fixture
-        ::Fixture.new(to_hash, meta.class_name)
       end
       
       def install_default_attributes!
@@ -50,6 +56,17 @@ module Dataset
       def now(column)
         (ActiveRecord::Base.default_timezone == :utc ? Time.now.utc : Time.now).to_s(:db)
       end
+      
+      private
+        def add_reflection_attributes(hash, name, reflection)
+          value = hash.delete(name)
+          case value
+          when Symbol
+            hash[reflection.primary_key_name] = session_binding.find_id(reflection.klass, value)
+          else
+            hash[reflection.primary_key_name] = value
+          end
+        end
     end
     
   end

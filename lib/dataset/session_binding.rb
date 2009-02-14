@@ -242,7 +242,7 @@ module Dataset
       def insert(dataset_record_class, record_type, *args)
         symbolic_name, attributes = extract_creation_arguments args
         record_meta  = record_meta_for_type(record_type)
-        record       = dataset_record_class.new(record_meta, attributes, symbolic_name)
+        record       = dataset_record_class.new(record_meta, attributes, symbolic_name, self)
         return_value = nil
         
         @model_finders.create_finder(record_meta)

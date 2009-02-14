@@ -2,12 +2,13 @@ module Dataset
   module Record # :nodoc:
     
     class Model # :nodoc:
-      attr_reader :attributes, :model, :meta, :symbolic_name
+      attr_reader :attributes, :model, :meta, :symbolic_name, :session_binding
       
-      def initialize(meta, attributes, symbolic_name = nil)
-        @meta          = meta
-        @attributes    = attributes.stringify_keys
-        @symbolic_name = symbolic_name || object_id
+      def initialize(meta, attributes, symbolic_name, session_binding)
+        @meta            = meta
+        @attributes      = attributes.stringify_keys
+        @symbolic_name   = symbolic_name || object_id
+        @session_binding = session_binding
       end
       
       def record_class
@@ -31,7 +32,15 @@ module Dataset
       def to_model
         @model ||= begin
           m = meta.record_class.new
-          attributes.each {|k,v| m.send "#{k}=", v}
+          attributes.each do |k,v|
+            if reflection = record_class.reflect_on_association(k.to_sym)
+              case v
+              when Symbol
+                v = session_binding.find_model(reflection.klass, v)
+              end
+            end
+            m.send "#{k}=", v
+          end
           m
         end
       end

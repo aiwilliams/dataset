@@ -54,6 +54,12 @@ describe Dataset::SessionBinding do
       Thing.last.created_on.should_not be_nil
       Thing.last.updated_on.should_not be_nil
     end
+    
+    it 'should support belongs_to associations using symbolic name of associated type' do
+      person_id = @binding.create_record Person, :person
+      @binding.create_record Note, :note, :person => :person
+      Note.last.person_id.should == person_id
+    end
   end
   
   describe 'create_model' do
@@ -71,6 +77,13 @@ describe Dataset::SessionBinding do
     it 'should bypass mass assignment restrictions' do
       person = @binding.create_model Person, :first_name => 'Adam', :last_name => 'Williams'
       person.last_name.should == 'Williams'
+    end
+    
+    
+    it 'should support belongs_to associations using symbolic name of associated type' do
+      person_id = @binding.create_record Person, :person
+      @binding.create_model Note, :note, :person => :person
+      Note.last.person_id.should == person_id
     end
   end
   
