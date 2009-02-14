@@ -158,6 +158,15 @@ module Dataset
     def name_model(*args)
       dataset_session_binding.name_model(*args)
     end
+    
+    # Converts string names into symbols for use in naming models
+    # 
+    #     name_to_sym 'my name' => :my_name
+    #     name_to_sym 'RPaul'  => :r_paul
+    # 
+    def name_to_sym(name)
+      dataset_session_binding.name_to_sym(name)
+    end
   end
   
   class SessionBinding # :nodoc:
@@ -236,6 +245,10 @@ module Dataset
         record_class = resolve_record_class(record_type)
         database.record_meta(record_class)
       end
+    end
+    
+    def name_to_sym(name)
+      name.to_s.underscore.gsub("'", "").gsub("\"", "").gsub(" ", "_").to_sym if name
     end
     
     protected
