@@ -133,6 +133,11 @@ describe Dataset::SessionBinding do
       @context.notes(:note_one, :note_two).should == [@note_one, note_two]
       @context.note_id(:note_one, :note_two).should == [@note_one.id, note_two.id]
     end
+    
+    it 'should support models inside modules' do
+      @binding.create_record Nested::Place, :myplace, :name => 'Home'
+      @context.nested_places(:myplace).name.should == 'Home'
+    end
   end
   
   describe 'name_model' do

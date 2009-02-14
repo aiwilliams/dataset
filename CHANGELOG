@@ -21,6 +21,18 @@
   create_record Note, :person => :myguy
   Note.last.person_id == person_id
 
+* Models inside modules are supported a little more conveniently [aiwilliams]
+
+  module MList
+    class Message < ActiveRecord::Base
+    end
+  end
+
+  # We'll get rid of the underscore in 'm_list_messages'
+  create_record MList::Message, :test
+  mlist_messages(:test)
+  
+  
 *1.0.0 [Scenarios Replacement] (December 15, 2008)
 
 * Drop-in replacement for Scenarios plugin of old [aiwilliams]

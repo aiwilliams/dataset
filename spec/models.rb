@@ -10,3 +10,9 @@ class Note < ActiveRecord::Base
 end
 class State < Place; end
 class NorthCarolina < State; end
+
+module Nested
+  class Place < ActiveRecord::Base
+    set_table_name 'places_table'
+  end
+end

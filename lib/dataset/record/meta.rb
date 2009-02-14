@@ -36,17 +36,21 @@ module Dataset
       
       def id_finder_names
         @id_finder_names ||= begin
-          names = record_class.self_and_descendents_from_active_record.collect {|c| c.name.underscore}
+          names = record_class.self_and_descendents_from_active_record.collect {|c| finder_name c}
           names.uniq.collect {|n| "#{n}_id".to_sym}
         end
       end
       
       def model_finder_names
-        @record_finder_names ||= record_class.self_and_descendents_from_active_record.collect {|c| c.name.underscore.pluralize.to_sym}.uniq
+        @record_finder_names ||= record_class.self_and_descendents_from_active_record.collect {|c| finder_name(c).pluralize.to_sym}.uniq
       end
       
       def to_s
         "#<RecordMeta: #{table_name}>"
+      end
+      
+      def finder_name(klass)
+        klass.name.underscore.gsub('/', '_').sub(/^(\w)_/, '\1').gsub(/_(\w)_/, '_\1')
       end
     end
     
