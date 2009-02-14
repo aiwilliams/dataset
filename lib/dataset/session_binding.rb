@@ -33,32 +33,44 @@ module Dataset
   #
   # == Single Table Inheritence
   #
-  # This is a TODO for Dataset. For now, you will have to use the finder of the base class:
-  #
   #    class Person < ActiveRecord::Base; end
   #    class User < Person; end
   #
   #    create_record :user, :bobby, :name => 'Bobby'
   #
-  #    people(:bobby)
+  #    people(:bobby) OR users(:bobby)
   #
   module ModelFinders
-    def create_finder(record_class) # :nodoc:
-      record_loader_base_name = record_class.name.underscore
-      define_method record_loader_base_name.pluralize do |*symbolic_names|
-        names = Array(symbolic_names)
-        models = names.inject([]) do |c,n|
-          c << dataset_session_binding.find_model(record_class, n); c
+    def create_finder(record_meta) # :nodoc:
+      @finders_generated ||= []
+      
+      return if @finders_generated.include?(record_meta)
+      
+      record_meta.model_finder_names.each do |finder_name|
+        unless instance_methods.include?(finder_name)
+          define_method finder_name do |*symbolic_names|
+            names = Array(symbolic_names)
+            models = names.inject([]) do |c,n|
+              c << dataset_session_binding.find_model(record_meta, n); c
+            end
+            names.size == 1 ? models.first : models
+          end
         end
-        names.size == 1 ? models.first : models
       end
-      define_method "#{record_loader_base_name}_id" do |*symbolic_names|
-        names = Array(symbolic_names)
-        ids = names.inject([]) do |c,n|
-          c << dataset_session_binding.find_id(record_class, n); c
+      
+      record_meta.id_finder_names.each do |finder_name|
+        unless instance_methods.include?(finder_name)
+          define_method finder_name do |*symbolic_names|
+            names = Array(symbolic_names)
+            ids = names.inject([]) do |c,n|
+              c << dataset_session_binding.find_id(record_meta, n); c
+            end
+            names.size == 1 ? ids.first : ids
+          end
         end
-        names.size == 1 ? ids.first : ids
       end
+      
+      @finders_generated << record_meta
     end
   end
   
@@ -154,7 +166,7 @@ module Dataset
     attr_reader :block_variables
     
     def initialize(database_or_parent_binding)
-      @symbolic_names_to_ids = Hash.new {|h,k| h[k] = {}}
+      @id_cache = Hash.new {|h,k| h[k] = {}}
       @record_methods = new_record_methods_module
       @model_finders = new_model_finders_module
       @block_variables = Hash.new
@@ -184,25 +196,25 @@ module Dataset
       insert(Dataset::Record::Fixture, record_type, *args)
     end
     
-    def find_id(record_type, symbolic_name)
-      record_class = resolve_record_class record_type
-      if local_id = @symbolic_names_to_ids[record_class][symbolic_name]
+    def find_id(record_type_or_meta, symbolic_name)
+      record_meta = record_meta_for_type(record_type_or_meta)
+      if local_id = @id_cache[record_meta.id_cache_key][symbolic_name]
         local_id
       elsif !parent_binding.nil?
-        parent_binding.find_id record_type, symbolic_name
+        parent_binding.find_id record_meta, symbolic_name
       else
-        raise RecordNotFound.new(record_type, symbolic_name)
+        raise RecordNotFound.new(record_meta, symbolic_name)
       end
     end
     
-    def find_model(record_type, symbolic_name)
-      record_class = resolve_record_class record_type
-      if local_id = @symbolic_names_to_ids[record_class][symbolic_name]
-        record_class.find local_id
+    def find_model(record_type_or_meta, symbolic_name)
+      record_meta = record_meta_for_type(record_type_or_meta)
+      if local_id = @id_cache[record_meta.id_cache_key][symbolic_name]
+        record_meta.record_class.find local_id
       elsif !parent_binding.nil?
-        parent_binding.find_model record_type, symbolic_name
+        parent_binding.find_model record_meta, symbolic_name
       else
-        raise RecordNotFound.new(record_type, symbolic_name)
+        raise RecordNotFound.new(record_meta, symbolic_name)
       end
     end
     
@@ -213,23 +225,30 @@ module Dataset
     end
     
     def name_model(record, symbolic_name)
-      record_class = record.class.base_class
-      @model_finders.create_finder(record_class) unless @symbolic_names_to_ids.has_key?(record_class)
-      @symbolic_names_to_ids[record_class][symbolic_name] = record.id
+      record_meta = database.record_meta(record.class)
+      @model_finders.create_finder(record_meta)
+      @id_cache[record_meta.id_cache_key][symbolic_name] = record.id
       record
+    end
+    
+    def record_meta_for_type(record_type)
+      record_type.is_a?(Record::Meta) ? record_type : begin
+        record_class = resolve_record_class(record_type)
+        database.record_meta(record_class)
+      end
     end
     
     protected
       def insert(dataset_record_class, record_type, *args)
         symbolic_name, attributes = extract_creation_arguments args
-        record_class = resolve_record_class record_type
-        record_meta  = database.record_meta record_class
+        record_meta  = record_meta_for_type(record_type)
         record       = dataset_record_class.new(record_meta, attributes, symbolic_name)
-        @model_finders.create_finder(record.record_class) unless @symbolic_names_to_ids.has_key?(record.record_class)
         return_value = nil
+        
+        @model_finders.create_finder(record_meta)
         ActiveRecord::Base.silence do
           return_value = record.create
-          @symbolic_names_to_ids[record.record_class][symbolic_name] = record.id
+          @id_cache[record_meta.id_cache_key][symbolic_name] = record.id
         end
         return_value
       end

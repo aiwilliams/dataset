@@ -14,8 +14,8 @@ describe Dataset::Database::Base do
   end
   
   it 'should not clear the "schema_migrations" table' do
-    ActiveRecord::Base.connection.insert("INSERT INTO schema_migrations (version) VALUES ('testing123')")
+    ActiveRecord::Base.connection.insert("INSERT INTO #{ActiveRecord::Migrator.schema_migrations_table_name} (version) VALUES ('testing123')")
     @database.clear
-    ActiveRecord::Base.connection.select_one("SELECT version FROM schema_migrations WHERE version = 'testing123'").should_not be_blank
+    ActiveRecord::Base.connection.select_one("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name} WHERE version = 'testing123'").should_not be_blank
   end
 end

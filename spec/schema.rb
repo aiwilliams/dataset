@@ -7,6 +7,7 @@ ActiveRecord::Schema.define(:version => 20081126181722) do
   create_table :places, :force => true do |t|
     t.column :name, :string
     t.column :location, :string 
+    t.column :type, :string
   end
   
   create_table :things, :force => true do |t|

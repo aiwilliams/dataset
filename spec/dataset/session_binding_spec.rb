@@ -87,6 +87,12 @@ describe Dataset::SessionBinding do
       end.should raise_error(NoMethodError)
     end
     
+    it 'should exist for the base classes of created types' do
+      @binding.create_record State, :state_one
+      @context.places(:state_one).should_not be_nil
+      @context.places(:state_one).should == @context.states(:state_one)
+    end
+    
     it 'should exist for types made with create_model' do
       @context.notes(:note_one).should == @note_one
       @context.note_id(:note_one).should == @note_one.id

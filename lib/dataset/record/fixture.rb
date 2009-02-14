@@ -27,7 +27,9 @@ module Dataset
       end
       
       def to_hash
-        @attributes
+        hash = @attributes.dup
+        hash[meta.inheritance_column] = meta.sti_name if meta.inheriting_record?
+        hash
       end
       
       def to_fixture

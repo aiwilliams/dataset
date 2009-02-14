@@ -4,3 +4,4 @@ end
 class Place < ActiveRecord::Base; end
 class Thing < ActiveRecord::Base; end
 class Note < ActiveRecord::Base; end
+class State < Place; end
