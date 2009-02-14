@@ -36,14 +36,13 @@ module Dataset
       
       def id_finder_names
         @id_finder_names ||= begin
-          names = [class_name.underscore]
-          names << (ActiveRecord::Base.pluralize_table_names ? table_name.singularize : table_name)
+          names = record_class.self_and_descendents_from_active_record.collect {|c| c.name.underscore}
           names.uniq.collect {|n| "#{n}_id".to_sym}
         end
       end
       
       def model_finder_names
-        @record_finder_names ||= [table_name.to_sym, class_name.underscore.pluralize.to_sym].uniq
+        @record_finder_names ||= record_class.self_and_descendents_from_active_record.collect {|c| c.name.underscore.pluralize.to_sym}.uniq
       end
       
       def to_s

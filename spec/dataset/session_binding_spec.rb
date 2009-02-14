@@ -93,6 +93,11 @@ describe Dataset::SessionBinding do
       @context.places(:state_one).should == @context.states(:state_one)
     end
     
+    it 'should exist for all ancestors' do
+      @binding.create_record NorthCarolina, :nc
+      @context.states(:nc).should == @context.north_carolinas(:nc)
+    end
+    
     it 'should exist for types made with create_model' do
       @context.notes(:note_one).should == @note_one
       @context.note_id(:note_one).should == @note_one.id
@@ -118,10 +123,19 @@ describe Dataset::SessionBinding do
   end
   
   describe 'name_model' do
+    before do
+      @state = State.create!(:name => 'NC')
+      @binding.name_model(@state, :mystate)
+    end
+    
     it 'should allow assigning a name to a model for later lookup' do
-      thing = Thing.create!
-      @binding.name_model(thing, :mything)
-      @binding.find_model(Thing, :mything).should == thing
+      @binding.find_model(State, :mystate).should == @state
+    end
+    
+    it 'should allow finding STI' do
+      @context = Object.new
+      @context.extend @binding.model_finders
+      @context.places(:mystate).should == @state
     end
   end
   

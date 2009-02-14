@@ -4,7 +4,7 @@ ActiveRecord::Schema.define(:version => 20081126181722) do
     t.column :last_name, :string
   end
   
-  create_table :places, :force => true do |t|
+  create_table :places_table, :force => true do |t|
     t.column :name, :string
     t.column :location, :string 
     t.column :type, :string

@@ -1,12 +1,13 @@
 *1.1.0 [UPCOMING RELEASE] (???)
 
-* STI is better supported for inserting and finding records [aiwilliams]
+* STI is better supported for inserting, naming and finding records [aiwilliams]
 
   class Place < ActiveRecord::Base; end
   class State < Place; end
+  class NorthCarolina < State; end
 
-  create_record(State, :state)         # no need to define the 'type' column value
-  states(:state) == places(:state)     # read with the table name or class name pluralized
+  create_record(NorthCarolina, :state)                        # no need to define the 'type' column value
+  states(:state) == places(:state) == north_carolinas(:state) # read with the class names pluralized
 
 * Moved to jeweler for much cleaner, github embracing gem building [aiwilliams]
 
