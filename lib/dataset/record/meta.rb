@@ -37,7 +37,7 @@ module Dataset
       def id_finder_names
         @id_finder_names ||= begin
           names = [class_name.underscore]
-          names << ActiveRecord::Base.pluralize_table_names ? table_name.singularize : table_name
+          names << (ActiveRecord::Base.pluralize_table_names ? table_name.singularize : table_name)
           names.uniq.collect {|n| "#{n}_id".to_sym}
         end
       end
