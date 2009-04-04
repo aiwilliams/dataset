@@ -31,7 +31,7 @@ FileUtils.mkdir_p(File.dirname(RAILS_LOG_FILE))
 FileUtils.touch(RAILS_LOG_FILE)
 FileUtils.mkdir_p("#{SPEC_ROOT}/tmp")
 FileUtils.rm_rf("#{SPEC_ROOT}/tmp/*")
-FileUtils.rm(SQLITE_DATABASE)
+FileUtils.rm_f(SQLITE_DATABASE)
 
 require 'logger'
 RAILS_DEFAULT_LOGGER = Logger.new(RAILS_LOG_FILE)

@@ -14,7 +14,7 @@ Plugit.describe do |dataset|
       rails.requires = %w{active_support active_record active_record/fixtures action_controller action_view}
     end
     env.library :rspec, :export => "git clone git://github.com/dchelimsky/rspec.git" do |rspec|
-      rspec.after_update { `git co -b rspecrelease 1.1.11 && mkdir -p #{vendor_directory} && ln -nsf #{File.expand_path('.')} #{vendor_directory + '/rspec'}` }
+      rspec.after_update { `git checkout -b rspecrelease 1.1.11 && mkdir -p #{vendor_directory} && ln -nsf #{File.expand_path('.')} #{vendor_directory + '/rspec'}` }
       rspec.requires = %w{spec}
     end
   end
