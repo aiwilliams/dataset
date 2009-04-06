@@ -17,5 +17,9 @@ Plugit.describe do |dataset|
       rspec.after_update { `git checkout -b rspecrelease 1.1.11 && mkdir -p #{vendor_directory} && ln -nsf #{File.expand_path('.')} #{vendor_directory + '/rspec'}` }
       rspec.requires = %w{spec}
     end
+    env.library :cucumber, :export => "git clone git://github.com/aslakhellesoy/cucumber.git" do |cukes|
+      cukes.after_update { `git fetch origin master; git checkout v0.2.3.1` }
+      cukes.requires = %w{cucumber}
+    end
   end
 end
