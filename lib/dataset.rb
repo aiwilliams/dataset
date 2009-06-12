@@ -1,3 +1,6 @@
+require 'activesupport'
+require 'activerecord'
+
 require 'dataset/version'
 require 'dataset/instance_methods'
 require 'dataset/base'

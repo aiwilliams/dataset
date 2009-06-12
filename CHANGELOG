@@ -1,11 +1,12 @@
 *1.3.0 [Rails 2.3.2] (??)
 
 * Supporting Rails 2.3.2 [mhawkins, underlog]
+* Added tasks to load path so folks can require 'dataset.rake' [aiwilliams]
+* Updated gemspec to include dependencies [aiwilliams]
 
 *1.2.0 [Cucumber] (April 8, 2009)
 
 * Support for cucumber [jgarber, seancribbs]
-
 
 *1.1.0 [STI, belongs_to] (February 14, 2009)
 

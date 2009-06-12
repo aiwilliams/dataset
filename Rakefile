@@ -19,6 +19,9 @@ begin
     s.summary = 'A simple API for creating and finding sets of data in your database, built on ActiveRecord.'
     s.email = 'adam@thewilliams.ws'
     s.files = FileList["[A-Z]*", "{lib,tasks}/**/*", "plugit/descriptor.rb"].exclude("tmp")
+    s.require_paths = ["lib", "tasks"]
+    s.add_dependency('activesupport', '>= 2.3.0')
+    s.add_dependency('activerecord', '>= 2.3.0')
     s.homepage = "http://github.com/aiwilliams/dataset"
     s.description = s.summary
     s.authors = ['Adam Williams']
