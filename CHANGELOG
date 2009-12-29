@@ -1,3 +1,7 @@
+*1.3.2 [Bugfix]
+
+* Fixed bug where sti finder names were not always generated correctly [aiwilliams]
+
 *1.3.0 [Rails 2.3.2] (??)
 
 * Supporting Rails 2.3.2 [mhawkins, underlog]
