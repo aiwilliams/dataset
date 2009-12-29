@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dataset}
-  s.version = "1.3.1"
+  s.version = "1.3.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Williams"]
-  s.date = %q{2009-12-22}
+  s.date = %q{2009-12-29}
   s.description = %q{A simple API for creating and finding sets of data in your database, built on ActiveRecord.}
   s.email = %q{adam@thewilliams.ws}
   s.extra_rdoc_files = [
@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
      "lib/dataset/instance_methods.rb",
      "lib/dataset/load.rb",
      "lib/dataset/record/fixture.rb",
+     "lib/dataset/record/heirarchy.rb",
      "lib/dataset/record/meta.rb",
      "lib/dataset/record/model.rb",
      "lib/dataset/resolver.rb",
@@ -54,7 +55,7 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/dataset/cucumber_spec.rb",
      "spec/dataset/database/base_spec.rb",
-     "spec/dataset/record/meta_spec.rb",
+     "spec/dataset/record/heirarchy_spec.rb",
      "spec/dataset/resolver_spec.rb",
      "spec/dataset/rspec_spec.rb",
      "spec/dataset/session_binding_spec.rb",

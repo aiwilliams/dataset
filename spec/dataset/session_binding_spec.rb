@@ -142,18 +142,23 @@ describe Dataset::SessionBinding do
   
   describe 'name_model' do
     before do
+      @place = Place.create!
+      @binding.name_model(@place, :myplace)
       @state = State.create!(:name => 'NC')
       @binding.name_model(@state, :mystate)
     end
     
     it 'should allow assigning a name to a model for later lookup' do
+      @binding.find_model(Place, :myplace).should == @place
       @binding.find_model(State, :mystate).should == @state
     end
     
     it 'should allow finding STI' do
       @context = Object.new
       @context.extend @binding.model_finders
+      @context.places(:myplace).should == @place
       @context.places(:mystate).should == @state
+      @context.states(:mystate).should == @state
     end
   end
   

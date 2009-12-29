@@ -5,8 +5,8 @@ module Dataset
   # raised.
   #
   class RecordNotFound < StandardError
-    def initialize(record_type, symbolic_name)
-      super "There is no '#{record_type.name}' found for the symbolic name ':#{symbolic_name}'."
+    def initialize(record_heirarchy, symbolic_name)
+      super "There is no '#{record_heirarchy.base_class.name}' found for the symbolic name ':#{symbolic_name}'."
     end
   end
   
@@ -41,12 +41,12 @@ module Dataset
   #    people(:bobby) OR users(:bobby)
   #
   module ModelFinders
-    def create_finder(record_meta) # :nodoc:
+    def create_finders(record_meta) # :nodoc:
       @finders_generated ||= []
+      heirarchy_finders_hash = record_meta.heirarchy.model_finder_names.join('').hash
+      return if @finders_generated.include?(heirarchy_finders_hash)
       
-      return if @finders_generated.include?(record_meta)
-      
-      record_meta.model_finder_names.each do |finder_name|
+      record_meta.heirarchy.model_finder_names.each do |finder_name|
         unless instance_methods.include?(finder_name)
           define_method finder_name do |*symbolic_names|
             names = Array(symbolic_names)
@@ -58,7 +58,7 @@ module Dataset
         end
       end
       
-      record_meta.id_finder_names.each do |finder_name|
+      record_meta.heirarchy.id_finder_names.each do |finder_name|
         unless instance_methods.include?(finder_name)
           define_method finder_name do |*symbolic_names|
             names = Array(symbolic_names)
@@ -70,7 +70,7 @@ module Dataset
         end
       end
       
-      @finders_generated << record_meta
+      @finders_generated << heirarchy_finders_hash
     end
   end
   
@@ -207,23 +207,25 @@ module Dataset
     
     def find_id(record_type_or_meta, symbolic_name)
       record_meta = record_meta_for_type(record_type_or_meta)
-      if local_id = @id_cache[record_meta.id_cache_key][symbolic_name]
+      heirarchy = record_meta.heirarchy
+      if local_id = @id_cache[heirarchy.id_cache_key][symbolic_name]
         local_id
       elsif !parent_binding.nil?
         parent_binding.find_id record_meta, symbolic_name
       else
-        raise RecordNotFound.new(record_meta, symbolic_name)
+        raise RecordNotFound.new(heirarchy, symbolic_name)
       end
     end
     
     def find_model(record_type_or_meta, symbolic_name)
       record_meta = record_meta_for_type(record_type_or_meta)
-      if local_id = @id_cache[record_meta.id_cache_key][symbolic_name]
-        record_meta.record_class.find local_id
+      heirarchy = record_meta.heirarchy
+      if local_id = @id_cache[heirarchy.id_cache_key][symbolic_name]
+        heirarchy.base_class.find local_id
       elsif !parent_binding.nil?
         parent_binding.find_model record_meta, symbolic_name
       else
-        raise RecordNotFound.new(record_meta, symbolic_name)
+        raise RecordNotFound.new(heirarchy, symbolic_name)
       end
     end
     
@@ -235,8 +237,8 @@ module Dataset
     
     def name_model(record, symbolic_name)
       record_meta = database.record_meta(record.class)
-      @model_finders.create_finder(record_meta)
-      @id_cache[record_meta.id_cache_key][symbolic_name] = record.id
+      @model_finders.create_finders(record_meta)
+      @id_cache[record_meta.heirarchy.id_cache_key][symbolic_name] = record.id
       record
     end
     
@@ -258,10 +260,10 @@ module Dataset
         record       = dataset_record_class.new(record_meta, attributes, symbolic_name, self)
         return_value = nil
         
-        @model_finders.create_finder(record_meta)
+        @model_finders.create_finders(record_meta)
         ActiveRecord::Base.silence do
           return_value = record.create
-          @id_cache[record_meta.id_cache_key][symbolic_name] = record.id
+          @id_cache[record_meta.heirarchy.id_cache_key][symbolic_name] = record.id
         end
         return_value
       end
