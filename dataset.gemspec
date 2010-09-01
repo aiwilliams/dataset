@@ -81,12 +81,12 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<activesupport>, [">= 2.3.0"])
       s.add_runtime_dependency(%q<activerecord>, [">= 2.3.0"])
     else
-      s.add_dependency(%q<activesupport>, [">= 2.3.0"])
-      s.add_dependency(%q<activerecord>, [">= 2.3.0"])
+      s.add_dependency(%q<activesupport>, [">= 3.0.0"])
+      s.add_dependency(%q<activerecord>, [">= 3.0.0"])
     end
   else
-    s.add_dependency(%q<activesupport>, [">= 2.3.0"])
-    s.add_dependency(%q<activerecord>, [">= 2.3.0"])
+    s.add_dependency(%q<activesupport>, [">= 3.0.0"])
+    s.add_dependency(%q<activerecord>, [">= 3.0.0"])
   end
 end
 
