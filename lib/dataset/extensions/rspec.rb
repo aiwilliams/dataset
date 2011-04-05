@@ -18,4 +18,4 @@ module Dataset
     
   end
 end
-Spec::Example::ExampleGroup.extend Dataset::Extensions::RSpecExampleGroup
+RSpec::Core::ExampleGroup.extend Dataset::Extensions::RSpecExampleGroup
