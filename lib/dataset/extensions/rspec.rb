@@ -2,6 +2,7 @@ module Dataset
   module Extensions # :nodoc:
     
     module RSpecExampleGroup # :nodoc:
+      puts "EXTENDED"
       def dataset(*datasets, &block)
         add_dataset(*datasets, &block)
         
