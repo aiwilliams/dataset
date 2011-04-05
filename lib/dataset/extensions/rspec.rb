@@ -1,8 +1,6 @@
 module Dataset
   module Extensions # :nodoc:
-    
     module RSpecExampleGroup # :nodoc:
-      puts "EXTENDED"
       def dataset(*datasets, &block)
         add_dataset(*datasets, &block)
         
@@ -16,7 +14,6 @@ module Dataset
         end
       end
     end
-    
   end
 end
 RSpec::Core::ExampleGroup.extend Dataset::Extensions::RSpecExampleGroup
