@@ -30,7 +30,7 @@
   class Note < ActiveRecord::Base
     belongs_to :person
   end
-  
+
   person_id = create_record Person, :myguy
   create_record Note, :person => :myguy
   Note.last.person_id == person_id

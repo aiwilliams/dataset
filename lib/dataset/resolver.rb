@@ -3,17 +3,17 @@ module Dataset
   #
   class DatasetNotFound < StandardError
   end
-  
+
   # A dataset may be referenced as a class or as a name. A Dataset::Resolver
   # will take an identifier, whether a class or a name, and return the class.
   #
   class Resolver
     cattr_accessor :default
-    
+
     def identifiers
       @identifiers ||= {}
     end
-    
+
     # Attempt to convert a name to a constant. With the identifier :people, it
     # will search for 'PeopleDataset', then 'People'.
     #
@@ -29,7 +29,7 @@ module Dataset
       end
       identifiers[identifier] = constant
     end
-    
+
     protected
       def resolve_identifier(identifier) # :nodoc:
         constant = resolve_class(identifier)
@@ -38,7 +38,7 @@ module Dataset
         end
         constant
       end
-      
+
       def resolve_class(identifier)
         names = [identifier.to_s.camelize, identifier.to_s.camelize + suffix]
         constant = resolve_these(names.reverse)
@@ -47,7 +47,7 @@ module Dataset
         end
         constant
       end
-      
+
       def resolve_these(names) # :nodoc:
         names.each do |name|
           constant = name.constantize rescue nil
@@ -55,12 +55,12 @@ module Dataset
         end
         nil
       end
-      
+
       def suffix # :nodoc:
         @suffix ||= 'Dataset'
       end
   end
-  
+
   # Resolves a dataset by looking for a file in the provided directory path
   # that has a name matching the identifier. Of course, should the identifier
   # be a class already, it is simply returned.
@@ -69,11 +69,11 @@ module Dataset
     def initialize(*paths)
       @paths = paths
     end
-    
+
     def <<(path)
       @paths << path
     end
-    
+
     protected
       def resolve_identifier(identifier) # :nodoc:
         @paths.each do |path|
@@ -95,16 +95,16 @@ module Dataset
         end
         raise DatasetNotFound, "Could not find a dataset file in #{@paths.inspect} having the name '#{identifier}.rb' or '#{identifier}_#{file_suffix}.rb'."
       end
-      
+
       def file_suffix # :nodoc:
         @file_suffix ||= suffix.downcase
       end
   end
-  
+
   # The default resolver, used by the Dataset::Sessions that aren't given a
   # different instance. You can set this to something else in your
   # test/spec_helper.
   #
   Resolver.default = Resolver.new
-  
+
 end

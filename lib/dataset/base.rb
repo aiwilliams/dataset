@@ -1,5 +1,5 @@
 module Dataset
-  
+
   # The superclass of your Dataset classes.
   #
   # It is recommended that you create a dataset using the Dataset::Block
@@ -25,11 +25,11 @@ module Dataset
         end
         @helper_methods.module_eval &method_definitions
       end
-      
+
       def helper_methods # :nodoc:
         @helper_methods
       end
-      
+
       # Allows a subsclass to declare which datasets it uses.
       #
       # Dataset is designed to promote 'design by composition', rather than
@@ -54,16 +54,16 @@ module Dataset
       #   C uses B
       #   A uses C
       #   B, C, A is the load order
-      # 
+      #
       def uses(*datasets)
         @used_datasets = datasets
       end
-      
+
       def used_datasets # :nodoc:
         @used_datasets
       end
     end
-    
+
     # Invoked once before a collection of tests is run. If you use a dataset
     # in multiple test classes, it will be called once for each of them -
     # remember that the database will be cleared at the beginning of running a
@@ -74,7 +74,7 @@ module Dataset
     #
     def load; end
   end
-  
+
   # The easiest way to create some data before a suite of tests is run is by
   # using a Dataset::Block. An example works wonders:
   #
@@ -82,7 +82,7 @@ module Dataset
   #      dataset do
   #        create_record :person, :billy, :name => 'Billy'
   #      end
-  #            
+  #
   #      def test_name
   #        assert_equal 'Billy', people(:billy).name
   #      end
@@ -98,17 +98,17 @@ module Dataset
   #
   #    describe Something do
   #      dataset :a              => Dataset :a is loaded (at the right time)
-  #         
+  #
   #      it 'should whatever'
   #      end
-  #         
+  #
   #      describe More do
   #        dataset :b            => Dataset :b is loaded. :a data is still there
-  #           
+  #
   #        it 'should'
   #        end
   #      end
-  #         
+  #
   #      describe Another do     => Database is restored to :a, without re-running :a logic
   #        it 'should'
   #        end
@@ -136,7 +136,7 @@ module Dataset
   #        id = create_record :person, :second_admin, :name => 'Admin Three'
   #        create_record :organization_administratorship, :organization_id => organization_id(:first_bank), :person_id => id
   #      end
-  #       
+  #
   #      def test_admins
   #        assert organizations(:first_bank).admins.include?(people(:second_admin))
   #      end
@@ -147,7 +147,7 @@ module Dataset
   # When you need to go beyond the block, create a Dataset::Base subclass!
   class Block < Base
     include Dataset::InstanceMethods
-    
+
     def load # :nodoc:
       dataset_session_binding.install_block_variables(self)
       doload
