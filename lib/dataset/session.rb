@@ -1,14 +1,14 @@
 module Dataset
   class Session # :nodoc:
     attr_accessor :dataset_resolver
-    
+
     def initialize(database, dataset_resolver = Resolver.default)
       @database = database
       @dataset_resolver = dataset_resolver
       @datasets = Hash.new
       @load_stack = []
     end
-    
+
     def add_dataset(test_class, dataset_identifier)
       dataset = dataset_resolver.resolve(dataset_identifier)
       if dataset.used_datasets
@@ -16,13 +16,13 @@ module Dataset
       end
       datasets_for(test_class) << dataset
     end
-    
+
     def datasets_for(test_class)
       if test_class.superclass
         @datasets[test_class] ||= Collection.new(datasets_for(test_class.superclass) || [])
       end
     end
-    
+
     def load_datasets_for(test_class)
       datasets = datasets_for(test_class)
       if last_load = @load_stack.last

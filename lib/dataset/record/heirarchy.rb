@@ -31,6 +31,7 @@ module Dataset
       
       def update(record_class)
         record_class.ancestors.each do |c|
+          next unless c.is_a? Class
           finder_name = model_finder_name(c)
           unless model_finder_names.include?(finder_name)
             model_finder_names << finder_name

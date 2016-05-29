@@ -9,7 +9,7 @@ module Dataset
       super "There is no '#{record_heirarchy.base_class.name}' found for the symbolic name ':#{symbolic_name}'."
     end
   end
-  
+
   # Whenever you use Dataset::RecordMethods, you will get finder methods in
   # your tests that help you load instances of the records you have created
   # (or named models).
@@ -45,7 +45,7 @@ module Dataset
       @finders_generated ||= []
       heirarchy_finders_hash = record_meta.heirarchy.model_finder_names.join('').hash
       return if @finders_generated.include?(heirarchy_finders_hash)
-      
+
       record_meta.heirarchy.model_finder_names.each do |finder_name|
         unless instance_methods.include?(finder_name)
           define_method finder_name do |*symbolic_names|
@@ -57,7 +57,7 @@ module Dataset
           end
         end
       end
-      
+
       record_meta.heirarchy.id_finder_names.each do |finder_name|
         unless instance_methods.include?(finder_name)
           define_method finder_name do |*symbolic_names|
@@ -69,18 +69,18 @@ module Dataset
           end
         end
       end
-      
+
       @finders_generated << heirarchy_finders_hash
     end
   end
-  
+
   # Any Dataset::Base subclass, dataset block, or test method in a
   # dataset-using test context (including setup/teardown/before/after) may
   # create and access models through these methods. Note that you should use
   # Dataset::ModelFinders if you can for finding your created data.
   #
   module RecordMethods
-    
+
     # Similar to old fashioned fixtures, this will do a direct database
     # insert, without running any validations or preventing you from writing
     # attr_protected attributes. Very nice for speed, but kind of a pain if
@@ -98,7 +98,7 @@ module Dataset
     def create_record(*args)
       dataset_session_binding.create_record(*args)
     end
-    
+
     # This will instantiate your model class and assign each attribute WITHOUT
     # using mass assignment. Validations will be run. Very nice for complex
     # structures or hard to keep right validations, but potentially a bit
@@ -116,7 +116,7 @@ module Dataset
     def create_model(*args)
       dataset_session_binding.create_model(*args)
     end
-    
+
     # Dataset will track each of the records it creates by symbolic name to
     # id. When you need the id of a record, there is no need to go to the
     # database.
@@ -128,7 +128,7 @@ module Dataset
     def find_id(*args)
       dataset_session_binding.find_id(*args)
     end
-    
+
     # Dataset will track each of the records it creates by symbolic name to
     # id. When you need an instance of a record, the stored id will be used to
     # do the fastest lookup possible: Person.find(23425234).
@@ -141,7 +141,7 @@ module Dataset
     def find_model(*args)
       dataset_session_binding.find_model(*args)
     end
-    
+
     # This is a great help when you want to create records in a custom helper
     # method, then make it and maybe things associated to it available to
     # tests through the Dataset::ModelFinders.
@@ -158,53 +158,53 @@ module Dataset
     def name_model(*args)
       dataset_session_binding.name_model(*args)
     end
-    
+
     # Converts string names into symbols for use in naming models
-    # 
+    #
     #     name_to_sym 'my name' => :my_name
     #     name_to_sym 'RPaul'  => :r_paul
-    # 
+    #
     def name_to_sym(name)
       dataset_session_binding.name_to_sym(name)
     end
   end
-  
+
   class SessionBinding # :nodoc:
     attr_reader :database, :parent_binding
     attr_reader :model_finders, :record_methods
     attr_reader :block_variables
-    
+
     def initialize(database_or_parent_binding)
       @id_cache = Hash.new {|h,k| h[k] = {}}
       @record_methods = new_record_methods_module
       @model_finders = new_model_finders_module
       @block_variables = Hash.new
-      
+
       case database_or_parent_binding
       when Dataset::SessionBinding
         @parent_binding = database_or_parent_binding
         @database = parent_binding.database
         @model_finders.module_eval { include database_or_parent_binding.model_finders }
         @block_variables.update(database_or_parent_binding.block_variables)
-      else 
+      else
         @database = database_or_parent_binding
       end
     end
-    
+
     def copy_block_variables(dataset_block)
       dataset_block.instance_variables.each do |name|
         self.block_variables[name] = dataset_block.instance_variable_get(name)
       end
     end
-    
+
     def create_model(record_type, *args)
       insert(Dataset::Record::Model, record_type, *args)
     end
-    
+
     def create_record(record_type, *args)
       insert(Dataset::Record::Fixture, record_type, *args)
     end
-    
+
     def find_id(record_type_or_meta, symbolic_name)
       record_meta = record_meta_for_type(record_type_or_meta)
       heirarchy = record_meta.heirarchy
@@ -216,7 +216,7 @@ module Dataset
         raise RecordNotFound.new(heirarchy, symbolic_name)
       end
     end
-    
+
     def find_model(record_type_or_meta, symbolic_name)
       record_meta = record_meta_for_type(record_type_or_meta)
       heirarchy = record_meta.heirarchy
@@ -228,38 +228,38 @@ module Dataset
         raise RecordNotFound.new(heirarchy, symbolic_name)
       end
     end
-    
+
     def install_block_variables(target)
       block_variables.each do |k,v|
         target.instance_variable_set(k,v)
       end
     end
-    
+
     def name_model(record, symbolic_name)
       record_meta = database.record_meta(record.class)
       @model_finders.create_finders(record_meta)
       @id_cache[record_meta.heirarchy.id_cache_key][symbolic_name] = record.id
       record
     end
-    
+
     def record_meta_for_type(record_type)
       record_type.is_a?(Record::Meta) ? record_type : begin
         record_class = resolve_record_class(record_type)
         database.record_meta(record_class)
       end
     end
-    
+
     def name_to_sym(name)
       name.to_s.underscore.gsub("'", "").gsub("\"", "").gsub(" ", "_").to_sym if name
     end
-    
+
     protected
       def insert(dataset_record_class, record_type, *args)
         symbolic_name, attributes = extract_creation_arguments args
         record_meta  = record_meta_for_type(record_type)
         record       = dataset_record_class.new(record_meta, attributes, symbolic_name, self)
         return_value = nil
-        
+
         @model_finders.create_finders(record_meta)
         ActiveRecord::Base.silence do
           return_value = record.create
@@ -267,7 +267,7 @@ module Dataset
         end
         return_value
       end
-      
+
       def extract_creation_arguments(arguments)
         if arguments.size == 2 && arguments.last.kind_of?(Hash)
           arguments
@@ -279,7 +279,7 @@ module Dataset
           [nil, Hash.new]
         end
       end
-      
+
       def new_model_finders_module
         mod = Module.new
         dataset_binding = self
@@ -291,7 +291,7 @@ module Dataset
         mod.extend ModelFinders
         mod
       end
-      
+
       def new_record_methods_module
         mod = Module.new do
           include RecordMethods
@@ -304,7 +304,7 @@ module Dataset
         end
         mod
       end
-      
+
       def resolve_record_class(record_type)
         case record_type
         when Symbol
